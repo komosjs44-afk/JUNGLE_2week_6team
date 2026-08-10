@@ -58,7 +58,7 @@ export function ReferenceDetailPage() {
   if (isError || !reference) {
     return (
       <div className="flex flex-1 flex-col">
-        <PageHeader title="Reference" />
+        <PageHeader title="참고 사진" />
         <ErrorState onRetry={() => refetch()} />
       </div>
     )
@@ -109,10 +109,13 @@ export function ReferenceDetailPage() {
           </div>
         </div>
 
-        <Link to={`/my`} className="flex items-center gap-2">
-          <Avatar nickname={reference.creator.nickname} avatarUrl={reference.creator.avatarUrl} size={28} />
-          <span className="text-sm font-medium text-neutral-700">{reference.creator.nickname}</span>
-        </Link>
+        <div className="flex flex-col gap-1">
+          <span className="text-[11px] font-medium text-neutral-400">기고자</span>
+          <Link to={`/my`} className="flex items-center gap-2">
+            <Avatar nickname={reference.creator.nickname} avatarUrl={reference.creator.avatarUrl} size={28} />
+            <span className="text-sm font-medium text-neutral-700">{reference.creator.nickname}</span>
+          </Link>
+        </div>
 
         <div className="flex flex-wrap gap-1.5">
           {reference.tags.map((tag) => (
@@ -137,7 +140,7 @@ export function ReferenceDetailPage() {
 
         {reference.shooting.creatorTip && (
           <div className="rounded-2xl border border-primary-100 bg-primary-50 p-4">
-            <p className="mb-1 text-xs font-medium text-primary-600">Creator Tip</p>
+            <p className="mb-1 text-xs font-medium text-primary-600">기고자 팁</p>
             <p className="text-sm leading-relaxed text-neutral-700">{reference.shooting.creatorTip}</p>
           </div>
         )}

@@ -99,7 +99,7 @@ export function UploadInfoPage() {
         </div>
 
         <Textarea
-          label="Creator Tip"
+          label="기고자 팁"
           placeholder="어떻게 촬영했는지 알려주세요 (최대 200자)"
           maxLength={200}
           value={creatorTip}
