@@ -33,6 +33,6 @@ export const useSaveStore = create<SaveState>()(
       isReferenceSaved: (id) => get().savedReferenceIds.includes(id),
       isSpotSaved: (id) => get().savedSpotIds.includes(id),
     }),
-    { name: 'reshot-saves' },
+    { name: 'reframe-saves' },
   ),
 )

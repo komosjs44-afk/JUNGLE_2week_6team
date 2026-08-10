@@ -1,10 +1,13 @@
+import { useNavigate } from 'react-router-dom'
 import { Navigation, Sparkles, MapPinned } from 'lucide-react'
 import type { Reference } from '@/types'
 import { buildShootingGuide } from '@/utils/shootingGuide'
 import { formatDistance } from '@/utils/format'
 import { Button } from '@/components/common/Button'
+import { KakaoMap } from '@/components/map/KakaoMap'
 
 export function GuideTab({ reference }: { reference: Reference }) {
+  const navigate = useNavigate()
   const guide = buildShootingGuide(reference)
   const directionsHref = `https://map.kakao.com/link/map/${encodeURIComponent(reference.spot.name)},${reference.spot.latitude},${reference.spot.longitude}`
 
@@ -27,6 +30,15 @@ export function GuideTab({ reference }: { reference: Reference }) {
           <p className="text-xs text-neutral-400">추천 화각</p>
           <p className="mt-1 text-base font-semibold text-neutral-900">{guide.recommendedFocalLength}</p>
         </div>
+      </div>
+
+      <div className="relative h-44 w-full overflow-hidden rounded-2xl">
+        <KakaoMap
+          spots={[reference.spot]}
+          selectedSpotId={reference.spot.id}
+          onSelectSpot={(spotId) => navigate(`/spots/${spotId}`)}
+          level={4}
+        />
       </div>
 
       <div className="rounded-2xl border border-primary-100 bg-primary-50 p-4">

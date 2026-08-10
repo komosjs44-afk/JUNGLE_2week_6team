@@ -11,7 +11,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  title = '아직 Reference가 없어요.',
+  title = '아직 참고 사진이 없어요.',
   description,
   icon,
   actionLabel,

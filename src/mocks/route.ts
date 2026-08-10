@@ -10,7 +10,7 @@ function requireSpot(id: string) {
 export const MOCK_ROUTE: Route = {
   id: 'route-1',
   title: '오늘의 추천 촬영 코스',
-  description: '저장한 Reference를 기반으로 추천했어요.',
+  description: '저장한 참고 사진을 기반으로 추천했어요.',
   spots: [
     { order: 1, spot: requireSpot('spot-1'), arrivalTime: '17:20', walkMinutesToNext: 12 },
     { order: 2, spot: requireSpot('spot-2'), arrivalTime: '18:00', walkMinutesToNext: 18 },

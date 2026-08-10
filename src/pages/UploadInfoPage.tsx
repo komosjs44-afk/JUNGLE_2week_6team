@@ -58,7 +58,7 @@ export function UploadInfoPage() {
     await mutateAsync({
       userId: user.id,
       spotId,
-      title: title.trim() || '제목 없는 Reference',
+      title: title.trim() || '제목 없는 참고 사진',
       imageUrl,
       tags,
       direction: direction ?? undefined,

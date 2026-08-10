@@ -27,7 +27,7 @@ export function SpotPreviewCard({ spot }: { spot: Spot }) {
         <div className="flex items-center gap-3 text-xs text-neutral-400">
           <span className="flex items-center gap-1">
             <Images size={12} />
-            Reference {spot.referenceCount}개
+            참고 사진 {spot.referenceCount}개
           </span>
         </div>
       </div>

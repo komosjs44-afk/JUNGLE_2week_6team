@@ -58,8 +58,8 @@ export function MyPage() {
       <div className="flex flex-col gap-4 px-4 py-4">
         <Tabs
           items={[
-            { value: 'reference', label: '저장 Reference' },
-            { value: 'spot', label: '저장 Spot' },
+            { value: 'reference', label: '저장한 참고 사진' },
+            { value: 'spot', label: '저장한 스팟' },
           ]}
           value={tab}
           onChange={setTab}
@@ -69,7 +69,7 @@ export function MyPage() {
           (refsLoading ? (
             <CardGridSkeleton />
           ) : savedReferences.length === 0 ? (
-            <EmptyState title="저장한 Reference가 없어요." />
+            <EmptyState title="저장한 참고 사진이 없어요." />
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {savedReferences.map((r) => (
@@ -82,7 +82,7 @@ export function MyPage() {
           (spotsLoading ? (
             <CardGridSkeleton />
           ) : savedSpots.length === 0 ? (
-            <EmptyState title="저장한 Spot이 없어요." />
+            <EmptyState title="저장한 스팟이 없어요." />
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {savedSpots.map((s) => (
@@ -93,11 +93,11 @@ export function MyPage() {
       </div>
 
       <div className="flex flex-col gap-3 px-4 py-4">
-        <h2 className="text-base font-semibold text-neutral-900">내가 등록한 Reference</h2>
+        <h2 className="text-base font-semibold text-neutral-900">내가 등록한 참고 사진</h2>
         {refsLoading ? (
           <CardGridSkeleton count={2} />
         ) : myReferences.length === 0 ? (
-          <EmptyState title="아직 등록한 Reference가 없어요." description="첫 Reference를 업로드해보세요." />
+          <EmptyState title="아직 등록한 참고 사진이 없어요." description="첫 참고 사진을 업로드해보세요." />
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {myReferences.map((r) => (

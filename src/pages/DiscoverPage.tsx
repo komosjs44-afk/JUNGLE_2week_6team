@@ -49,7 +49,7 @@ export function DiscoverPage() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-neutral-100 bg-white/95 px-4 backdrop-blur">
-        <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:SHOT</h1>
+        <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:FRAME</h1>
         <div className="flex items-center gap-1">
           <IconButton aria-label="검색">
             <Search size={20} />
@@ -79,8 +79,8 @@ export function DiscoverPage() {
             </Link>
           </div>
           <Section title="오늘의 추천" tab="recommended" />
-          <Section title="지금 인기 있는 Reference" tab="popular" />
-          <Section title="신규 Reference" tab="new" />
+          <Section title="지금 인기 있는 참고 사진" tab="popular" />
+          <Section title="신규 참고 사진" tab="new" />
         </>
       ) : (
         <section className="flex flex-col gap-3 px-4 py-4">

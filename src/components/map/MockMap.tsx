@@ -8,7 +8,7 @@ const LNG_RANGE: [number, number] = [126.98, 127.07]
 function toPosition(spot: Spot): { left: string; top: string } {
   const x = ((spot.longitude - LNG_RANGE[0]) / (LNG_RANGE[1] - LNG_RANGE[0])) * 100
   const y = 100 - ((spot.latitude - LAT_RANGE[0]) / (LAT_RANGE[1] - LAT_RANGE[0])) * 100
-  return { left: `${Math.min(92, Math.max(8, x))}%`, top: `${Math.min(88, Math.max(12, y))}%` }
+  return { left: `${Math.min(82, Math.max(18, x))}%`, top: `${Math.min(85, Math.max(15, y))}%` }
 }
 
 interface MockMapProps {
@@ -19,12 +19,12 @@ interface MockMapProps {
 
 export function MockMap({ spots, selectedSpotId, onSelectSpot }: MockMapProps) {
   return (
-    <div className="relative h-full w-full overflow-hidden bg-neutral-100">
+    <div className="absolute inset-0 overflow-hidden bg-neutral-100">
       <div
         className="absolute inset-0 opacity-60"
         style={{
           backgroundImage:
-            'linear-gradient(#e4e4e7 1px, transparent 1px), linear-gradient(90deg, #e4e4e7 1px, transparent 1px)',
+            'linear-gradient(var(--color-neutral-200) 1px, transparent 1px), linear-gradient(90deg, var(--color-neutral-200) 1px, transparent 1px)',
           backgroundSize: '28px 28px',
         }}
       />
