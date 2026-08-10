@@ -11,3 +11,13 @@ export interface Spot {
   referenceCount: number
   createdAt: string
 }
+
+/** Fields needed to register a brand-new Spot, e.g. from an uploaded photo's location. */
+export interface NewSpotInput {
+  name: string
+  address?: string
+  latitude: number
+  longitude: number
+  imageUrl: string
+  tags?: string[]
+}

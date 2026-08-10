@@ -1,10 +1,39 @@
 import { useEffect, useRef, useState } from 'react'
-import type { Spot } from '@/types'
+import type { DeviceLocation, Spot } from '@/types'
 import { loadKakaoMaps } from '@/features/map/kakaoMapsLoader'
 import { MockMap } from './MockMap'
 
 const PIN_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>'
+
+// Distinct from spot pins (no label, centered dot instead of base-anchored pin) so it always
+// reads as "you are here" rather than another photo spot.
+function createCurrentLocationContent(): HTMLElement {
+  const wrapper = document.createElement('div')
+  wrapper.style.cssText = 'position:relative;width:18px;height:18px;'
+
+  const halo = document.createElement('div')
+  halo.style.cssText =
+    'position:absolute;inset:-9px;border-radius:9999px;background:rgba(59,130,246,0.25);'
+
+  const dot = document.createElement('div')
+  dot.style.cssText =
+    'position:absolute;inset:0;border-radius:9999px;background:#3b82f6;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);'
+
+  wrapper.appendChild(halo)
+  wrapper.appendChild(dot)
+  return wrapper
+}
+
+// A labelless version of the spot pin — used for a manually tapped/searched point that isn't
+// (yet) a registered spot, so it reads as "temporarily picked here" rather than a named spot.
+function createPickedLocationContent(): HTMLElement {
+  const pin = document.createElement('div')
+  pin.style.cssText =
+    'display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;box-shadow:0 2px 6px rgba(0,0,0,.18);background:var(--color-primary-600);color:#fff;'
+  pin.innerHTML = PIN_SVG
+  return pin
+}
 
 function createMarkerContent(spot: Spot, isSelected: boolean, onClick: () => void): HTMLElement {
   const wrapper = document.createElement('div')
@@ -29,12 +58,35 @@ interface KakaoMapProps {
   selectedSpotId?: string | null
   onSelectSpot?: (spotId: string) => void
   level?: number
+  /** Device GPS location (navigator.geolocation), not a spot's or photo's location. */
+  currentLocation?: DeviceLocation | null
+  /**
+   * Where to point the camera on first load (e.g. a photo's EXIF GPS) — unlike
+   * currentLocation, this renders no marker, so it never reads as "you are here".
+   */
+  initialCenter?: { latitude: number; longitude: number } | null
+  /** A manually tapped/searched point that isn't necessarily a registered spot. */
+  pickedLocation?: { latitude: number; longitude: number } | null
+  /** Fires with the tapped coordinates when the map is clicked. */
+  onMapClick?: (lat: number, lng: number) => void
 }
 
-export function KakaoMap({ spots, selectedSpotId = null, onSelectSpot, level = 4 }: KakaoMapProps) {
+export function KakaoMap({
+  spots,
+  selectedSpotId = null,
+  onSelectSpot,
+  level = 4,
+  currentLocation = null,
+  initialCenter = null,
+  pickedLocation = null,
+  onMapClick,
+}: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<kakao.maps.Map | null>(null)
   const overlaysRef = useRef<kakao.maps.CustomOverlay[]>([])
+  const currentLocationOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null)
+  const pickedLocationOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null)
+  const hasCenteredOnCurrentLocationRef = useRef(false)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   useEffect(() => {
@@ -47,9 +99,18 @@ export function KakaoMap({ spots, selectedSpotId = null, onSelectSpot, level = 4
     loadKakaoMaps()
       .then(() => {
         if (cancelled || !containerRef.current || mapRef.current) return
-        const first = spots[0]
-        const center = new window.kakao.maps.LatLng(first.latitude, first.longitude)
+        // initialCenter (e.g. a photo's EXIF GPS) wins outright since it's available
+        // synchronously. Otherwise prefer the device's current location if it's already
+        // resolved by the time the SDK loads; else fall back to the first spot (unchanged
+        // pre-geolocation behavior) — geolocation is async and usually slower than this, so
+        // the re-center effect below handles it arriving after the map already exists.
+        const center = initialCenter
+          ? new window.kakao.maps.LatLng(initialCenter.latitude, initialCenter.longitude)
+          : currentLocation
+            ? new window.kakao.maps.LatLng(currentLocation.latitude, currentLocation.longitude)
+            : new window.kakao.maps.LatLng(spots[0].latitude, spots[0].longitude)
         mapRef.current = new window.kakao.maps.Map(containerRef.current, { center, level })
+        if (initialCenter || currentLocation) hasCenteredOnCurrentLocationRef.current = true
         setStatus('ready')
       })
       .catch(() => {
@@ -63,6 +124,75 @@ export function KakaoMap({ spots, selectedSpotId = null, onSelectSpot, level = 4
     // map hasn't been created yet (guarded by mapRef.current above).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spots])
+
+  // Geolocation usually resolves after the map is already created off of spots[0]; re-center
+  // exactly once when it arrives so the map doesn't keep yanking back if the user has panned.
+  useEffect(() => {
+    if (status !== 'ready' || !mapRef.current || !currentLocation) return
+    if (hasCenteredOnCurrentLocationRef.current) return
+    mapRef.current.setCenter(new window.kakao.maps.LatLng(currentLocation.latitude, currentLocation.longitude))
+    hasCenteredOnCurrentLocationRef.current = true
+  }, [status, currentLocation])
+
+  useEffect(() => {
+    if (status !== 'ready' || !mapRef.current) return
+
+    if (!currentLocation) {
+      currentLocationOverlayRef.current?.setMap(null)
+      currentLocationOverlayRef.current = null
+      return
+    }
+
+    const position = new window.kakao.maps.LatLng(currentLocation.latitude, currentLocation.longitude)
+    if (currentLocationOverlayRef.current) {
+      currentLocationOverlayRef.current.setPosition(position)
+      return
+    }
+
+    currentLocationOverlayRef.current = new window.kakao.maps.CustomOverlay({
+      position,
+      content: createCurrentLocationContent(),
+      xAnchor: 0.5,
+      yAnchor: 0.5,
+      zIndex: 3,
+    })
+    currentLocationOverlayRef.current.setMap(mapRef.current)
+  }, [status, currentLocation])
+
+  useEffect(() => {
+    if (status !== 'ready' || !mapRef.current || !onMapClick) return
+    const map = mapRef.current
+    const handler = (e: unknown) => {
+      const { latLng } = e as kakao.maps.MapMouseEvent
+      onMapClick(latLng.getLat(), latLng.getLng())
+    }
+    window.kakao.maps.event.addListener(map, 'click', handler)
+    return () => window.kakao.maps.event.removeListener(map, 'click', handler)
+  }, [status, onMapClick])
+
+  useEffect(() => {
+    if (status !== 'ready' || !mapRef.current) return
+
+    if (!pickedLocation) {
+      pickedLocationOverlayRef.current?.setMap(null)
+      pickedLocationOverlayRef.current = null
+      return
+    }
+
+    const position = new window.kakao.maps.LatLng(pickedLocation.latitude, pickedLocation.longitude)
+    if (pickedLocationOverlayRef.current) {
+      pickedLocationOverlayRef.current.setPosition(position)
+      return
+    }
+
+    pickedLocationOverlayRef.current = new window.kakao.maps.CustomOverlay({
+      position,
+      content: createPickedLocationContent(),
+      yAnchor: 1,
+      zIndex: 4,
+    })
+    pickedLocationOverlayRef.current.setMap(mapRef.current)
+  }, [status, pickedLocation])
 
   useEffect(() => {
     if (status !== 'ready' || !mapRef.current) return

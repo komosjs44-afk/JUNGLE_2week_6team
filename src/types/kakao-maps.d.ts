@@ -29,13 +29,7 @@ declare namespace kakao.maps {
   class Marker {
     constructor(options: MarkerOptions)
     setMap(map: Map | null): void
-    setPosition(position: LatLng): void
     getPosition(): LatLng
-  }
-
-  // 지도 클릭 등 마우스 이벤트가 넘겨주는 객체
-  interface MouseEvent {
-    latLng: LatLng
   }
 
   interface CustomOverlayOptions {
@@ -59,33 +53,27 @@ declare namespace kakao.maps {
     function removeListener(target: object, type: string, handler: (...args: unknown[]) => void): void
   }
 
+  /** Payload of a Map 'click' event — only the field this project actually reads. */
+  interface MapMouseEvent {
+    latLng: LatLng
+  }
+
   function load(callback: () => void): void
 
-  // libraries=services 로 로드되는 장소검색·주소변환 API
+  // Loaded via the SDK script's &libraries=services query param (see kakaoMapsLoader.ts).
   namespace services {
     type Status = 'OK' | 'ZERO_RESULT' | 'ERROR'
-    const Status: { OK: 'OK'; ZERO_RESULT: 'ZERO_RESULT'; ERROR: 'ERROR' }
-
-    interface PlacesSearchResultItem {
-      id: string
-      place_name: string
-      address_name: string
-      road_address_name: string
-      category_name: string
-      x: string // 경도(lng)
-      y: string // 위도(lat)
-    }
-
-    class Places {
-      keywordSearch(
-        keyword: string,
-        callback: (result: PlacesSearchResultItem[], status: Status) => void,
-      ): void
-    }
 
     interface Coord2AddressResultItem {
-      address: { address_name: string } | null
-      road_address: { address_name: string } | null
+      address: {
+        address_name: string
+        region_1depth_name: string
+        region_2depth_name: string
+        region_3depth_name: string
+      } | null
+      road_address: {
+        address_name: string
+      } | null
     }
 
     class Geocoder {
@@ -93,6 +81,22 @@ declare namespace kakao.maps {
         lng: number,
         lat: number,
         callback: (result: Coord2AddressResultItem[], status: Status) => void,
+      ): void
+    }
+
+    interface PlacesSearchResultItem {
+      id: string
+      place_name: string
+      address_name: string
+      road_address_name: string
+      x: string
+      y: string
+    }
+
+    class Places {
+      keywordSearch(
+        keyword: string,
+        callback: (data: PlacesSearchResultItem[], status: Status, pagination: unknown) => void,
       ): void
     }
   }

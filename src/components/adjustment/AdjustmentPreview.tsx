@@ -60,10 +60,10 @@ export function AdjustmentPreview({ imageUrl, recipe, showBefore }: AdjustmentPr
   }, [ready, recipe, showBefore])
 
   return (
-    <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-100">
+    <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-neutral-100">
       <canvas ref={canvasRef} className="h-full w-full object-cover" />
       {!ready && <div className="absolute inset-0 animate-pulse bg-neutral-200" />}
-      <span className="absolute top-3 left-3 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+      <span className="absolute top-3 left-3 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium text-white">
         {showBefore ? 'Before' : 'After'}
       </span>
     </div>

@@ -10,7 +10,7 @@ export function SpotCard({ spot }: { spot: Spot }) {
 
   return (
     <Link to={`/spots/${spot.id}`} className="group flex flex-col gap-2">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-100">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-neutral-100">
         <img src={spot.imageUrl} alt={spot.name} loading="lazy" className="h-full w-full object-cover" />
         <button
           type="button"

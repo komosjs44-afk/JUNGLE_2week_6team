@@ -32,8 +32,8 @@ export function UploadInfoPage() {
     previewUrl,
     exif,
     spotId,
+    photoLocation,
     newSpotName,
-    manualLocation,
     direction,
     creatorTip,
     tags,
@@ -42,19 +42,24 @@ export function UploadInfoPage() {
     setCreatorTip,
     toggleTag,
     setTitle,
+    setNewSpotName,
   } = useUploadWizardStore()
   const { mutateAsync, isPending, error } = useCreateReference()
   const [isCompressing, setIsCompressing] = useState(false)
 
-  // 기존 스팟(spotId) 또는 새 장소(newSpotName+manualLocation) 중 하나는 있어야 함
-  const hasLocation = !!spotId || !!(newSpotName && manualLocation)
-
   useEffect(() => {
-    if (!file || !hasLocation) navigate('/upload', { replace: true })
-  }, [file, hasLocation, navigate])
+    if (!file || (!spotId && !photoLocation)) navigate('/upload', { replace: true })
+  }, [file, spotId, photoLocation, navigate])
+
+  // 새 스팟(기존 spotId 없음) 생성 시 이름이 필요 — 확인된 장소명/주소로 기본값 채움
+  useEffect(() => {
+    if (spotId || !photoLocation || newSpotName) return
+    setNewSpotName(photoLocation.placeName ?? photoLocation.address ?? '')
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spotId, photoLocation])
 
   async function handleSubmit() {
-    if (!user || !file || !previewUrl || !hasLocation) return
+    if (!user || !file || !previewUrl || (!spotId && !photoLocation)) return
 
     setIsCompressing(true)
     const compressed = await compressImage(file)
@@ -64,12 +69,10 @@ export function UploadInfoPage() {
 
     await mutateAsync({
       userId: user.id,
-      spotId: spotId ?? null,
-      // 기존 스팟이 없으면 새 장소로 생성
-      newSpotName: spotId ? undefined : newSpotName,
-      newSpotLat: spotId ? undefined : manualLocation?.lat,
-      newSpotLng: spotId ? undefined : manualLocation?.lng,
-      newSpotAddress: spotId ? undefined : manualLocation?.address,
+      spotId,
+      // 기존 스팟이 없으면 촬영 위치(photoLocation)로 새 장소 생성
+      photoLocation: spotId ? undefined : (photoLocation ?? undefined),
+      newSpotName: spotId ? undefined : newSpotName.trim() || undefined,
       title: title.trim() || '제목 없는 참고 사진',
       imageUrl,
       tags,
@@ -88,6 +91,15 @@ export function UploadInfoPage() {
 
       <div className="flex flex-1 flex-col gap-5 px-4 py-4">
         <Input label="제목" placeholder="예) 성수 연무장길 노을" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+        {!spotId && photoLocation && (
+          <Input
+            label="새 스팟 이름"
+            placeholder="예) 크래프톤 정글 캠퍼스"
+            value={newSpotName}
+            onChange={(e) => setNewSpotName(e.target.value)}
+          />
+        )}
 
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-neutral-700">촬영 방향</span>

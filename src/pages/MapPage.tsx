@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
-import { useSpots } from '@/hooks'
+import { useSpots, useGeolocation } from '@/hooks'
 import { KakaoMap } from '@/components/map/KakaoMap'
 import { SpotPreviewCard } from '@/components/map/SpotPreviewCard'
 import { Tag } from '@/components/common/Tag'
@@ -14,6 +14,7 @@ export function MapPage() {
   const [filter, setFilter] = useState('전체')
   const [selectedSpotId, setSelectedSpotId] = useState<string | null>(null)
   const { data: spots, isError, refetch } = useSpots(search || undefined)
+  const { location: currentLocation } = useGeolocation()
 
   const filteredSpots = useMemo(() => {
     if (!spots) return []
@@ -48,11 +49,16 @@ export function MapPage() {
         {isError ? (
           <ErrorState onRetry={() => refetch()} />
         ) : (
-          <KakaoMap spots={filteredSpots} selectedSpotId={selectedSpotId} onSelectSpot={setSelectedSpotId} />
+          <KakaoMap
+            spots={filteredSpots}
+            selectedSpotId={selectedSpotId}
+            onSelectSpot={setSelectedSpotId}
+            currentLocation={currentLocation}
+          />
         )}
 
         {!isError && spots && filteredSpots.length === 0 && (
-          <div className="absolute inset-x-6 top-6 rounded-2xl bg-white shadow-lg shadow-black/5">
+          <div className="absolute inset-x-6 top-6 rounded-lg bg-white shadow-lg shadow-black/5">
             <EmptyState title="검색 결과가 없어요." description="다른 장소나 태그로 검색해보세요." />
           </div>
         )}

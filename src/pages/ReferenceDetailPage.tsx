@@ -1,6 +1,5 @@
-import type { ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Camera, Compass, Heart, MapPin, MessageCircle, ScanLine, Sparkles } from 'lucide-react'
+import { Camera, Heart, MapPin, MessageCircle } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useReference } from '@/hooks'
 import { useSaveStore } from '@/stores'
@@ -13,30 +12,9 @@ import { Avatar } from '@/components/common/Avatar'
 import { Accordion } from '@/components/common/Accordion'
 import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
+import { InfoRow } from '@/components/common/InfoRow'
 import { formatDirection } from '@/utils/direction'
 import { formatDaypart, formatFocalLength, formatLikeCount, formatTimeOfDay } from '@/utils/format'
-
-function InfoRow({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-start gap-3 py-2.5">
-      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600">
-        {icon}
-      </div>
-      <div>
-        <p className="text-xs text-neutral-400">{label}</p>
-        <p className="mt-0.5 text-sm font-medium text-neutral-900">{value}</p>
-      </div>
-    </div>
-  )
-}
 
 export function ReferenceDetailPage() {
   const { referenceId } = useParams<{ referenceId: string }>()
@@ -48,7 +26,7 @@ export function ReferenceDetailPage() {
   if (isLoading) {
     return (
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <Skeleton className="aspect-[3/4] w-full rounded-2xl" />
+        <Skeleton className="aspect-[3/4] w-full rounded-lg" />
         <Skeleton className="h-6 w-2/3" />
         <Skeleton className="h-4 w-1/2" />
       </div>
@@ -123,23 +101,15 @@ export function ReferenceDetailPage() {
           ))}
         </div>
 
-        <div className="divide-y divide-neutral-100 rounded-2xl bg-neutral-50 px-4">
-          <InfoRow icon={<MapPin size={15} />} label="촬영 위치" value={reference.spot.name} />
-          <InfoRow icon={<Sparkles size={15} />} label="촬영 시간" value={timeLabel} />
-          <InfoRow
-            icon={<Compass size={15} />}
-            label="촬영 방향"
-            value={formatDirection(reference.shooting.direction)}
-          />
-          <InfoRow
-            icon={<ScanLine size={15} />}
-            label="화각"
-            value={formatFocalLength(reference.shooting.focalLength)}
-          />
+        <div className="divide-y divide-neutral-100">
+          <InfoRow label="촬영 위치" value={reference.spot.name} />
+          <InfoRow label="촬영 시간" value={timeLabel} />
+          <InfoRow label="촬영 방향" value={formatDirection(reference.shooting.direction)} />
+          <InfoRow label="화각" value={formatFocalLength(reference.shooting.focalLength)} />
         </div>
 
         {reference.shooting.creatorTip && (
-          <div className="rounded-2xl border border-primary-100 bg-primary-50 p-4">
+          <div className="rounded-md border border-primary-100 bg-primary-50 p-4">
             <p className="mb-1 text-xs font-medium text-primary-600">기고자 팁</p>
             <p className="text-sm leading-relaxed text-neutral-700">{reference.shooting.creatorTip}</p>
           </div>

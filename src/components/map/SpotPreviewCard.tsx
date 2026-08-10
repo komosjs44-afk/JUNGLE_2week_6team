@@ -12,9 +12,9 @@ export function SpotPreviewCard({ spot }: { spot: Spot }) {
   return (
     <Link
       to={`/spots/${spot.id}`}
-      className="flex gap-3 rounded-2xl border border-neutral-100 bg-white p-3 shadow-lg shadow-black/5"
+      className="flex gap-3 rounded-lg border border-neutral-100 bg-white p-3 shadow-lg shadow-black/5"
     >
-      <img src={spot.imageUrl} alt={spot.name} className="h-20 w-20 shrink-0 rounded-xl object-cover" />
+      <img src={spot.imageUrl} alt={spot.name} className="h-20 w-20 shrink-0 rounded-md object-cover" />
       <div className="flex flex-1 flex-col justify-between overflow-hidden">
         <div>
           <p className="truncate text-sm font-semibold text-neutral-900">{spot.name}</p>

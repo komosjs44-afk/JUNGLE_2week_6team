@@ -42,7 +42,7 @@ export function UploadPage() {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-100"
+            className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-neutral-100"
           >
             <img src={previewUrl} alt="선택한 사진" className="h-full w-full object-cover" />
             <span className="absolute right-2 bottom-2 rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white">
@@ -53,7 +53,7 @@ export function UploadPage() {
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-neutral-200 text-neutral-400"
+            className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-neutral-200 text-neutral-400"
           >
             <ImagePlus size={32} />
             <span className="text-sm font-medium">탭해서 사진 선택하기</span>

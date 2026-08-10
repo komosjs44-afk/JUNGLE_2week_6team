@@ -35,7 +35,6 @@ export function loadKakaoMaps(): Promise<typeof kakao> {
     }
 
     const script = document.createElement('script')
-    // libraries=services: 장소 키워드 검색(Places), 좌표→주소 변환(Geocoder) 사용
     script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${encodeURIComponent(appKey)}&autoload=false&libraries=services`
     script.async = true
     script.setAttribute(SDK_SCRIPT_ATTR, 'true')

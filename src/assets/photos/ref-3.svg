@@ -1,18 +1,18 @@
 <svg width="900" height="1200" viewBox="0 0 900 1200" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bg-ref-3" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1e1b4b" />
-      <stop offset="50%" stop-color="#7c2d12" />
-      <stop offset="100%" stop-color="#f59e0b" />
+      <stop offset="0%" stop-color="#262220" />
+      <stop offset="50%" stop-color="#86663c" />
+      <stop offset="100%" stop-color="#445069" />
     </linearGradient>
     <filter id="blur-ref-3"><feGaussianBlur stdDeviation="90" /></filter>
   </defs>
   <rect width="900" height="1200" fill="url(#bg-ref-3)" />
   <g filter="url(#blur-ref-3)">
-    <circle cx="677" cy="1132" r="336" fill="#1e1b4b" opacity="0.37" />
-    <circle cx="295" cy="421" r="420" fill="#7c2d12" opacity="0.50" />
-    <circle cx="152" cy="181" r="316" fill="#1e1b4b" opacity="0.48" />
-    <circle cx="884" cy="236" r="256" fill="#1e1b4b" opacity="0.41" />
-    <circle cx="293" cy="503" r="465" fill="#f59e0b" opacity="0.27" />
+    <circle cx="677" cy="1132" r="336" fill="#262220" opacity="0.37" />
+    <circle cx="295" cy="421" r="420" fill="#86663c" opacity="0.50" />
+    <circle cx="152" cy="181" r="316" fill="#262220" opacity="0.48" />
+    <circle cx="884" cy="236" r="256" fill="#262220" opacity="0.41" />
+    <circle cx="293" cy="503" r="465" fill="#445069" opacity="0.27" />
   </g>
 </svg>

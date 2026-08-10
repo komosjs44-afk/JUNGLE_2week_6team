@@ -40,8 +40,8 @@ export function RoutePage() {
                   {index < route.spots.length - 1 && <span className="my-1 w-px flex-1 bg-neutral-200" />}
                 </div>
                 <div className="flex-1 pb-6">
-                  <Link to={`/spots/${rs.spot.id}`} className="flex items-center gap-3 rounded-2xl border border-neutral-100 p-3">
-                    <img src={rs.spot.imageUrl} alt={rs.spot.name} className="h-14 w-14 rounded-xl object-cover" />
+                  <Link to={`/spots/${rs.spot.id}`} className="flex items-center gap-3 rounded-md border border-neutral-100 p-3">
+                    <img src={rs.spot.imageUrl} alt={rs.spot.name} className="h-14 w-14 rounded-md object-cover" />
                     <div>
                       <p className="text-sm font-semibold text-neutral-900">{rs.spot.name}</p>
                       <p className="flex items-center gap-1 text-xs text-neutral-400">
@@ -58,11 +58,9 @@ export function RoutePage() {
             ))}
           </div>
 
-          <div className="rounded-2xl bg-neutral-900 p-4 text-center text-white">
-            <p className="text-sm font-medium">
-              총 {formatDistance(route.totalDistanceKm * 1000)} · {formatDuration(route.totalDurationMinutes)}
-            </p>
-          </div>
+          <p className="border-t border-neutral-100 pt-4 text-center text-sm font-medium text-neutral-700">
+            총 {formatDistance(route.totalDistanceKm * 1000)} · {formatDuration(route.totalDurationMinutes)}
+          </p>
 
           <Button
             fullWidth

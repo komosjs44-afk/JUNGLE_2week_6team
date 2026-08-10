@@ -24,7 +24,7 @@ export function BottomNavigation() {
             {({ isActive }) =>
               isCenter ? (
                 <>
-                  <span className="-mt-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white shadow-lg shadow-primary-600/30">
+                  <span className="-mt-5 flex h-12 w-12 items-center justify-center rounded-full bg-primary-600 text-white">
                     <Icon size={22} />
                   </span>
                   <span className={clsx('font-medium', isActive ? 'text-primary-600' : 'text-neutral-400')}>
