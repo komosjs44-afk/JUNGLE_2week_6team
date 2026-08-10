@@ -16,6 +16,9 @@ import { UploadCompletePage } from '@/pages/UploadCompletePage'
 import { RankingPage } from '@/pages/RankingPage'
 import { RoutePage } from '@/pages/RoutePage'
 import { MyPage } from '@/pages/MyPage'
+import { SettingsPage } from '@/pages/SettingsPage'
+import { SearchPage } from '@/pages/SearchPage'
+import { AiAdjustPage } from '@/pages/AiAdjustPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
 export function AppRouter() {
@@ -46,6 +49,9 @@ export function AppRouter() {
         <Route path="/ranking" element={<RankingPage />} />
         <Route path="/route" element={<RoutePage />} />
         <Route path="/my" element={<MyPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/ai-adjust" element={<AiAdjustPage />} />
       </Route>
 
       <Route path="*" element={<NotFoundPage />} />

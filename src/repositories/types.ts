@@ -15,6 +15,13 @@ export interface ReferenceRepository {
   getById(id: string): Promise<Reference | null>
   getBySpotId(spotId: string): Promise<Reference[]>
   create(input: NewReferenceInput): Promise<Reference>
+  remove(id: string): Promise<void>
+}
+
+export interface ProfileUpdate {
+  nickname?: string
+  bio?: string
+  website?: string
 }
 
 export interface SpotRepository {
@@ -34,6 +41,7 @@ export interface AuthRepository {
   login(email: string, password: string): Promise<User>
   signup(nickname: string, email: string, password: string): Promise<User>
   logout(): Promise<void>
+  updateProfile(userId: string, patch: ProfileUpdate): Promise<User>
 }
 
 export interface SaveRepository {

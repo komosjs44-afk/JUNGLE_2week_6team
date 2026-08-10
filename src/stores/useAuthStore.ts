@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
+import type { ProfileUpdate } from '@/repositories/types'
 import { authService } from '@/services'
 import { getCurrentUser } from '@/repositories/supabase/authRepository'
 
@@ -11,6 +12,7 @@ interface AuthState {
   init: () => Promise<void>
   login: (email: string, password: string) => Promise<void>
   signup: (nickname: string, email: string, password: string) => Promise<void>
+  updateProfile: (patch: ProfileUpdate) => Promise<void>
   logout: () => void
   clearError: () => void
 }
@@ -46,6 +48,19 @@ export const useAuthStore = create<AuthState>()(
           set({ user, isLoading: false })
         } catch (err) {
           set({ error: err instanceof Error ? err.message : '회원가입에 실패했어요.', isLoading: false })
+          throw err
+        }
+      },
+
+      updateProfile: async (patch) => {
+        const current = useAuthStore.getState().user
+        if (!current) return
+        set({ isLoading: true, error: null })
+        try {
+          const user = await authService.updateProfile(current.id, patch)
+          set({ user, isLoading: false })
+        } catch (err) {
+          set({ error: err instanceof Error ? err.message : '프로필 수정에 실패했어요.', isLoading: false })
           throw err
         }
       },

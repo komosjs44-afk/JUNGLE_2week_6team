@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Bell, ChevronRight, Search, Sparkles } from 'lucide-react'
 import { useReferences } from '@/hooks'
 import { Tabs } from '@/components/common/Tabs'
@@ -43,6 +43,7 @@ function Section({ title, tab, limit = 6 }: { title: string; tab: DiscoverTab; l
 }
 
 export function DiscoverPage() {
+  const navigate = useNavigate()
   const [tab, setTab] = useState<DiscoverTab>('recommended')
   const { data, isLoading, isError, refetch } = useReferences(tab)
 
@@ -51,7 +52,7 @@ export function DiscoverPage() {
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-neutral-100 bg-white/95 px-4 backdrop-blur">
         <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:SHOT</h1>
         <div className="flex items-center gap-1">
-          <IconButton aria-label="검색">
+          <IconButton aria-label="검색" onClick={() => navigate('/search')}>
             <Search size={20} />
           </IconButton>
           <IconButton aria-label="알림">

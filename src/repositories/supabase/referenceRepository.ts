@@ -185,8 +185,14 @@ export const supabaseReferenceRepository: ReferenceRepository = {
       .single()
     if (error) throw error
 
-    const created = await this.getById(inserted.id)
+    const created = await supabaseReferenceRepository.getById(inserted.id)
     if (!created) throw new Error('레퍼런스를 생성했지만 불러오지 못했어요.')
     return created
+  },
+
+  async remove(id) {
+    // RLS: 본인 것만 삭제 가능 (references_delete 정책)
+    const { error } = await supabase.from('references').delete().eq('id', id)
+    if (error) throw error
   },
 }

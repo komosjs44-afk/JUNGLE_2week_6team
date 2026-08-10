@@ -61,6 +61,22 @@ export const supabaseAuthRepository: AuthRepository = {
   async logout() {
     await supabase.auth.signOut()
   },
+
+  async updateProfile(userId, patch) {
+    // RLS: 본인 프로필만 수정 가능 (profiles_update 정책)
+    const { data, error } = await supabase
+      .from('profiles')
+      .update({
+        ...(patch.nickname !== undefined ? { nickname: patch.nickname } : {}),
+        ...(patch.bio !== undefined ? { bio: patch.bio } : {}),
+        ...(patch.website !== undefined ? { website: patch.website } : {}),
+      })
+      .eq('id', userId)
+      .select('*')
+      .single()
+    if (error) throw error
+    return toUser(data as ProfileRow)
+  },
 }
 
 // 앱 시작 시 세션 복원용: 저장된 Supabase 세션이 있으면 그 사용자를 돌려줌

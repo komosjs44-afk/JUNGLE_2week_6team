@@ -69,4 +69,10 @@ export const mockReferenceRepository: ReferenceRepository = {
     store.unshift(newReference)
     return mockDelay(newReference, 500)
   },
+
+  async remove(id) {
+    const idx = store.findIndex((r) => r.id === id)
+    if (idx >= 0) store.splice(idx, 1)
+    return mockDelay(undefined, 200)
+  },
 }

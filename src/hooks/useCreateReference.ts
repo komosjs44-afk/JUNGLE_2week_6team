@@ -10,3 +10,13 @@ export function useCreateReference() {
     },
   })
 }
+
+export function useDeleteReference() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => referenceService.remove(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['references'] })
+    },
+  })
+}

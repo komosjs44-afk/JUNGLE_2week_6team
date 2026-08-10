@@ -30,4 +30,8 @@ export const mockAuthRepository: AuthRepository = {
   async logout() {
     return mockDelay(undefined, 150)
   },
+
+  async updateProfile(_userId, patch) {
+    return mockDelay({ ...CURRENT_USER, ...patch }, 200)
+  },
 }
