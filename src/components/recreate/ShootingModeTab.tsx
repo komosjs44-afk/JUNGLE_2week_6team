@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { clsx } from 'clsx'
-import { Aperture, Moon, GalleryHorizontal, User, Sparkle } from 'lucide-react'
+import { Aperture, Moon, GalleryHorizontal, User, Film } from 'lucide-react'
 import { MOCK_SHOOTING_MODES } from '@/mocks'
 import type { ShootingModeId } from '@/types'
 import { Tag } from '@/components/common/Tag'
@@ -9,7 +9,7 @@ const MODE_ICONS: Record<ShootingModeId, typeof Aperture> = {
   normal: Aperture,
   portrait: User,
   night: Moon,
-  cinematic: Sparkle,
+  cinematic: Film,
   panorama: GalleryHorizontal,
 }
 
@@ -28,7 +28,7 @@ export function ShootingModeTab() {
             type="button"
             onClick={() => setSelected(mode.id)}
             className={clsx(
-              'flex flex-col gap-2 rounded-2xl border p-4 text-left transition-colors',
+              'flex flex-col gap-2 rounded-md border p-4 text-left transition-colors',
               isSelected ? 'border-primary-500 bg-primary-50' : 'border-neutral-100 bg-white',
             )}
           >

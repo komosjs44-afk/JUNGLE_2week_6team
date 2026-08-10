@@ -53,7 +53,53 @@ declare namespace kakao.maps {
     function removeListener(target: object, type: string, handler: (...args: unknown[]) => void): void
   }
 
+  /** Payload of a Map 'click' event — only the field this project actually reads. */
+  interface MapMouseEvent {
+    latLng: LatLng
+  }
+
   function load(callback: () => void): void
+
+  // Loaded via the SDK script's &libraries=services query param (see kakaoMapsLoader.ts).
+  namespace services {
+    type Status = 'OK' | 'ZERO_RESULT' | 'ERROR'
+
+    interface Coord2AddressResultItem {
+      address: {
+        address_name: string
+        region_1depth_name: string
+        region_2depth_name: string
+        region_3depth_name: string
+      } | null
+      road_address: {
+        address_name: string
+      } | null
+    }
+
+    class Geocoder {
+      coord2Address(
+        lng: number,
+        lat: number,
+        callback: (result: Coord2AddressResultItem[], status: Status) => void,
+      ): void
+    }
+
+    interface PlacesSearchResultItem {
+      id: string
+      place_name: string
+      address_name: string
+      road_address_name: string
+      x: string
+      y: string
+    }
+
+    class Places {
+      keywordSearch(
+        keyword: string,
+        callback: (data: PlacesSearchResultItem[], status: Status, pagination: unknown) => void,
+      ): void
+    }
+  }
 }
 
 interface Window {

@@ -7,6 +7,7 @@ export function useCreateReference() {
     mutationFn: referenceService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['references'] })
+      queryClient.invalidateQueries({ queryKey: ['spots'] })
     },
   })
 }

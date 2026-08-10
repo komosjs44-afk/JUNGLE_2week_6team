@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { Navigation, Sparkles, MapPinned } from 'lucide-react'
+import { Navigation, Lightbulb, MapPinned } from 'lucide-react'
 import type { Reference } from '@/types'
 import { buildShootingGuide } from '@/utils/shootingGuide'
 import { formatDistance } from '@/utils/format'
 import { Button } from '@/components/common/Button'
+import { InfoRow } from '@/components/common/InfoRow'
 import { KakaoMap } from '@/components/map/KakaoMap'
 
 export function GuideTab({ reference }: { reference: Reference }) {
@@ -13,26 +14,14 @@ export function GuideTab({ reference }: { reference: Reference }) {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-neutral-50 p-4">
-          <p className="text-xs text-neutral-400">촬영 위치까지</p>
-          <p className="mt-1 text-lg font-bold text-neutral-900">{formatDistance(guide.distanceMeters)}</p>
-        </div>
-        <div className="rounded-2xl bg-neutral-50 p-4">
-          <p className="text-xs text-neutral-400">촬영 방향</p>
-          <p className="mt-1 text-lg font-bold text-neutral-900">{guide.directionLabel}</p>
-        </div>
-        <div className="rounded-2xl bg-neutral-50 p-4">
-          <p className="text-xs text-neutral-400">추천 시간</p>
-          <p className="mt-1 text-base font-semibold text-neutral-900">{guide.recommendedTimeRange}</p>
-        </div>
-        <div className="rounded-2xl bg-neutral-50 p-4">
-          <p className="text-xs text-neutral-400">추천 화각</p>
-          <p className="mt-1 text-base font-semibold text-neutral-900">{guide.recommendedFocalLength}</p>
-        </div>
+      <div className="divide-y divide-neutral-100">
+        <InfoRow label="촬영 위치까지" value={formatDistance(guide.distanceMeters)} />
+        <InfoRow label="촬영 방향" value={guide.directionLabel} />
+        <InfoRow label="추천 시간" value={guide.recommendedTimeRange} />
+        <InfoRow label="추천 화각" value={guide.recommendedFocalLength} />
       </div>
 
-      <div className="relative h-44 w-full overflow-hidden rounded-2xl">
+      <div className="relative h-44 w-full overflow-hidden rounded-lg">
         <KakaoMap
           spots={[reference.spot]}
           selectedSpotId={reference.spot.id}
@@ -41,33 +30,21 @@ export function GuideTab({ reference }: { reference: Reference }) {
         />
       </div>
 
-      <div className="rounded-2xl border border-primary-100 bg-primary-50 p-4">
+      <div className="rounded-md border border-primary-100 bg-primary-50 p-4">
         <p className="mb-1 flex items-center gap-1.5 text-xs font-medium text-primary-600">
-          <Sparkles size={13} />
+          <Lightbulb size={13} />
           구도 Tip
         </p>
         <p className="text-sm leading-relaxed text-neutral-700">{guide.compositionTip}</p>
       </div>
 
-      <div className="rounded-2xl bg-neutral-900 p-4 text-white">
-        <p className="mb-3 text-xs text-neutral-400">원본 Camera Setting</p>
-        <div className="grid grid-cols-4 gap-2 text-center">
-          <div>
-            <p className="text-[11px] text-neutral-400">화각</p>
-            <p className="mt-1 text-sm font-semibold">{guide.cameraSetting.focalLength}mm</p>
-          </div>
-          <div>
-            <p className="text-[11px] text-neutral-400">조리개</p>
-            <p className="mt-1 text-sm font-semibold">F{guide.cameraSetting.aperture}</p>
-          </div>
-          <div>
-            <p className="text-[11px] text-neutral-400">ISO</p>
-            <p className="mt-1 text-sm font-semibold">{guide.cameraSetting.iso}</p>
-          </div>
-          <div>
-            <p className="text-[11px] text-neutral-400">셔터</p>
-            <p className="mt-1 text-sm font-semibold">{guide.cameraSetting.shutterSpeed}</p>
-          </div>
+      <div>
+        <p className="mb-1 text-xs text-neutral-400">원본 Camera Setting</p>
+        <div className="divide-y divide-neutral-100">
+          <InfoRow label="화각" value={`${guide.cameraSetting.focalLength}mm`} />
+          <InfoRow label="조리개" value={`F${guide.cameraSetting.aperture}`} />
+          <InfoRow label="ISO" value={guide.cameraSetting.iso} />
+          <InfoRow label="셔터" value={guide.cameraSetting.shutterSpeed} />
         </div>
       </div>
 

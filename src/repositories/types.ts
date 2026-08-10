@@ -6,6 +6,7 @@ import type {
   RankingTab,
   User,
   NewReferenceInput,
+  NewSpotInput,
 } from '@/types'
 
 export type DiscoverTab = 'recommended' | 'popular' | 'nearby' | 'new'
@@ -20,6 +21,7 @@ export interface ReferenceRepository {
 export interface SpotRepository {
   list(query?: string): Promise<Spot[]>
   getById(id: string): Promise<Spot | null>
+  create(input: NewSpotInput): Promise<Spot>
 }
 
 export interface RouteRepository {

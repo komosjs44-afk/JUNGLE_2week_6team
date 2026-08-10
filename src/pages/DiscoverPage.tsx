@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Bell, ChevronRight, Search, Sparkles } from 'lucide-react'
+import { Bell, ChevronRight, Search } from 'lucide-react'
 import { useReferences } from '@/hooks'
 import { Tabs } from '@/components/common/Tabs'
 import { ReferenceCard } from '@/components/reference/ReferenceCard'
@@ -71,10 +71,7 @@ export function DiscoverPage() {
               to="/route"
               className="flex items-center justify-between rounded-2xl bg-neutral-900 px-4 py-3.5 text-white"
             >
-              <span className="flex items-center gap-2 text-sm font-medium">
-                <Sparkles size={16} />
-                오늘의 추천 촬영 코스 보기
-              </span>
+              <span className="text-sm font-medium">오늘의 추천 촬영 코스 보기</span>
               <ChevronRight size={16} />
             </Link>
           </div>

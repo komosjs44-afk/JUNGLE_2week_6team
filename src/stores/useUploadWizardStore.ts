@@ -1,11 +1,5 @@
 import { create } from 'zustand'
-import type { ExifData } from '@/types'
-
-export interface ManualLocation {
-  lat: number
-  lng: number
-  address: string
-}
+import type { ExifData, PhotoLocation } from '@/types'
 
 interface UploadWizardState {
   file: File | null
@@ -14,8 +8,8 @@ interface UploadWizardState {
   exifStatus: 'idle' | 'analyzing' | 'found' | 'not_found'
 
   spotId: string | null
+  photoLocation: PhotoLocation | null
   newSpotName: string
-  manualLocation: ManualLocation | null
 
   direction: number | null
   creatorTip: string
@@ -25,8 +19,8 @@ interface UploadWizardState {
   setFile: (file: File, previewUrl: string) => void
   setExif: (exif: ExifData | null, status: UploadWizardState['exifStatus']) => void
   setSpotId: (id: string | null) => void
+  setPhotoLocation: (location: PhotoLocation | null) => void
   setNewSpotName: (name: string) => void
-  setManualLocation: (loc: ManualLocation | null) => void
   setDirection: (deg: number | null) => void
   setCreatorTip: (tip: string) => void
   toggleTag: (tag: string) => void
@@ -40,8 +34,8 @@ const initialState = {
   exif: null,
   exifStatus: 'idle' as const,
   spotId: null,
+  photoLocation: null,
   newSpotName: '',
-  manualLocation: null,
   direction: null,
   creatorTip: '',
   tags: [] as string[],
@@ -51,11 +45,15 @@ const initialState = {
 export const useUploadWizardStore = create<UploadWizardState>((set) => ({
   ...initialState,
 
-  setFile: (file, previewUrl) => set({ file, previewUrl }),
+  // A new photo invalidates any spot/location resolved for the previous one — otherwise a
+  // stale auto-matched spotId (or photoLocation/newSpotName) from an earlier photo in the
+  // same session leaks into this one.
+  setFile: (file, previewUrl) =>
+    set({ file, previewUrl, spotId: null, photoLocation: null, newSpotName: '' }),
   setExif: (exif, exifStatus) => set({ exif, exifStatus }),
   setSpotId: (spotId) => set({ spotId }),
+  setPhotoLocation: (photoLocation) => set({ photoLocation }),
   setNewSpotName: (newSpotName) => set({ newSpotName }),
-  setManualLocation: (manualLocation) => set({ manualLocation }),
   setDirection: (direction) => set({ direction }),
   setCreatorTip: (creatorTip) => set({ creatorTip: creatorTip.slice(0, 200) }),
   toggleTag: (tag) =>

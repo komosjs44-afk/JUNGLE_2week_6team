@@ -11,7 +11,7 @@ export function ReferenceCard({ reference }: { reference: Reference }) {
 
   return (
     <Link to={`/references/${reference.id}`} className="group flex flex-col gap-2">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-100">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-neutral-100">
         <img
           src={reference.imageUrl}
           alt={reference.title}

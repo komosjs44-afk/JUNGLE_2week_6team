@@ -1,7 +1,8 @@
 import type { ReferenceRepository, DiscoverTab } from '../types'
 import type { Reference } from '@/types'
-import { MOCK_REFERENCES, getUserById, getSpotById } from '@/mocks'
+import { MOCK_REFERENCES, getUserById } from '@/mocks'
 import { mockDelay } from './delay'
+import { mockSpotRepository } from './spotRepository'
 
 const store: Reference[] = [...MOCK_REFERENCES]
 
@@ -41,9 +42,28 @@ export const mockReferenceRepository: ReferenceRepository = {
 
   async create(input) {
     const creator = getUserById(input.userId)
-    const spot = input.spotId ? getSpotById(input.spotId) : undefined
     if (!creator) throw new Error('알 수 없는 사용자예요.')
-    if (!spot) throw new Error('알 수 없는 장소예요.')
+
+    let spot = input.spotId ? await mockSpotRepository.getById(input.spotId) : null
+
+    // No existing Spot chosen — uploading a photo with a location creates a brand-new Spot,
+    // it's never required to match one that's already registered.
+    if (!spot && input.photoLocation) {
+      spot = await mockSpotRepository.create({
+        name:
+          input.newSpotName?.trim() ||
+          input.photoLocation.placeName ||
+          input.photoLocation.address ||
+          '새로운 촬영 스팟',
+        address: input.photoLocation.address,
+        latitude: input.photoLocation.latitude,
+        longitude: input.photoLocation.longitude,
+        imageUrl: input.imageUrl,
+        tags: input.tags,
+      })
+    }
+
+    if (!spot) throw new Error('촬영 위치 정보가 없어요.')
 
     const newReference: Reference = {
       id: `ref-new-${Date.now()}`,

@@ -31,6 +31,8 @@ export function UploadInfoPage() {
     previewUrl,
     exif,
     spotId,
+    photoLocation,
+    newSpotName,
     direction,
     creatorTip,
     tags,
@@ -39,16 +41,26 @@ export function UploadInfoPage() {
     setCreatorTip,
     toggleTag,
     setTitle,
+    setNewSpotName,
   } = useUploadWizardStore()
   const { mutateAsync, isPending, error } = useCreateReference()
   const [isCompressing, setIsCompressing] = useState(false)
 
   useEffect(() => {
-    if (!file || !spotId) navigate('/upload', { replace: true })
-  }, [file, spotId, navigate])
+    if (!file || (!spotId && !photoLocation)) navigate('/upload', { replace: true })
+  }, [file, spotId, photoLocation, navigate])
+
+  // Creating a new Spot (no existing spotId) needs a name — default it from the resolved
+  // place name/address so most users never have to type anything.
+  useEffect(() => {
+    if (spotId || !photoLocation || newSpotName) return
+    setNewSpotName(photoLocation.placeName ?? photoLocation.address ?? '')
+    // Only pre-fill once when there's nothing there yet.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spotId, photoLocation])
 
   async function handleSubmit() {
-    if (!user || !file || !previewUrl || !spotId) return
+    if (!user || !file || !previewUrl || (!spotId && !photoLocation)) return
 
     setIsCompressing(true)
     const compressed = await compressImage(file)
@@ -58,6 +70,8 @@ export function UploadInfoPage() {
     await mutateAsync({
       userId: user.id,
       spotId,
+      photoLocation: spotId ? undefined : (photoLocation ?? undefined),
+      newSpotName: spotId ? undefined : newSpotName.trim() || undefined,
       title: title.trim() || '제목 없는 참고 사진',
       imageUrl,
       tags,
@@ -76,6 +90,15 @@ export function UploadInfoPage() {
 
       <div className="flex flex-1 flex-col gap-5 px-4 py-4">
         <Input label="제목" placeholder="예) 성수 연무장길 노을" value={title} onChange={(e) => setTitle(e.target.value)} />
+
+        {!spotId && photoLocation && (
+          <Input
+            label="새 스팟 이름"
+            placeholder="예) 크래프톤 정글 캠퍼스"
+            value={newSpotName}
+            onChange={(e) => setNewSpotName(e.target.value)}
+          />
+        )}
 
         <div className="flex flex-col gap-2">
           <span className="text-sm font-medium text-neutral-700">촬영 방향</span>

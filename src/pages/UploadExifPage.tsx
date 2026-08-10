@@ -7,6 +7,8 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { ProgressBar } from '@/components/common/ProgressBar'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
+import { StateIcon } from '@/components/common/EmptyState'
+import { InfoRow } from '@/components/common/InfoRow'
 
 const EXIF_ROWS: { key: 'cameraMake' | 'cameraModel' | 'lensModel' | 'aperture' | 'iso' | 'shutterSpeed'; label: string }[] = [
   { key: 'cameraMake', label: 'Camera' },
@@ -49,39 +51,27 @@ export function UploadExifPage() {
         )}
 
         {exifStatus === 'found' && exif && (
-          <div className="rounded-2xl border border-primary-100 bg-primary-50 p-4">
-            <p className="mb-3 flex items-center gap-1.5 text-sm font-semibold text-primary-700">
-              <CheckCircle2 size={16} />
-              촬영 정보를 자동으로 추출했어요!
+          <div>
+            <p className="mb-1 flex items-center gap-1.5 text-sm font-semibold text-neutral-900">
+              <CheckCircle2 size={16} className="text-primary-600" />
+              촬영 정보를 자동으로 추출했어요
             </p>
-            <div className="flex flex-col gap-2 text-sm">
+            <div className="divide-y divide-neutral-100">
               {EXIF_ROWS.map(({ key, label }) => {
                 const value = exif[key]
                 if (!value) return null
                 return (
-                  <div key={key} className="flex justify-between">
-                    <span className="text-neutral-500">{label}</span>
-                    <span className="font-medium text-neutral-900">
-                      {key === 'aperture' ? `F${value}` : value}
-                    </span>
-                  </div>
+                  <InfoRow key={key} label={label} value={key === 'aperture' ? `F${value}` : value} />
                 )
               })}
-              <div className="flex justify-between">
-                <span className="text-neutral-500">GPS</span>
-                <span className="font-medium text-neutral-900">
-                  {exif.latitude ? '감지됨' : '감지되지 않음'}
-                </span>
-              </div>
+              <InfoRow label="GPS" value={exif.latitude ? '감지됨' : '감지되지 않음'} />
             </div>
           </div>
         )}
 
         {exifStatus === 'not_found' && (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 py-16 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
-              <Info size={22} />
-            </div>
+            <StateIcon icon={<Info size={22} />} />
             <p className="text-sm font-medium text-neutral-700">사진에서 촬영 정보를 찾지 못했어요.</p>
             <p className="text-xs text-neutral-400">위치와 촬영 정보를 직접 입력해주세요.</p>
           </div>
