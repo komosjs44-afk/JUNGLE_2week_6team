@@ -4,6 +4,7 @@ import { clsx } from 'clsx'
 import { useUploadWizardStore, useAuthStore } from '@/stores'
 import { useCreateReference } from '@/hooks'
 import { compressImage } from '@/features/upload/compressImage'
+import { uploadReferenceImage } from '@/features/upload/uploadImage'
 import { RECOMMENDED_TAGS } from '@/mocks'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { ProgressBar } from '@/components/common/ProgressBar'
@@ -52,7 +53,8 @@ export function UploadInfoPage() {
 
     setIsCompressing(true)
     const compressed = await compressImage(file)
-    const imageUrl = URL.createObjectURL(compressed)
+    // 임시 blob URL 대신 Storage에 업로드해서 영구 public URL 사용
+    const imageUrl = await uploadReferenceImage(compressed, user.id)
     setIsCompressing(false)
 
     await mutateAsync({
