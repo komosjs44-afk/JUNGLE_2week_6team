@@ -50,7 +50,7 @@ export function DiscoverPage() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-neutral-100 bg-white/95 px-4 backdrop-blur">
-        <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:SHOT</h1>
+        <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:FRAME</h1>
         <div className="flex items-center gap-1">
           <IconButton aria-label="검색" onClick={() => navigate('/search')}>
             <Search size={20} />

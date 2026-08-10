@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'RE:SHOT',
-        short_name: 'RE:SHOT',
+        name: 'RE:FRAME',
+        short_name: 'RE:FRAME',
         description: '마음에 든 사진을, 직접 다시 찍다.',
         theme_color: '#007a5e',
         background_color: '#f7faf9',

@@ -72,6 +72,6 @@ export const useAuthStore = create<AuthState>()(
 
       clearError: () => set({ error: null }),
     }),
-    { name: 'reshot-auth', partialize: (state) => ({ user: state.user }) },
+    { name: 'reframe-auth', partialize: (state) => ({ user: state.user }) },
   ),
 )
