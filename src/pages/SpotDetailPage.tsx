@@ -12,6 +12,7 @@ import { Skeleton, CardGridSkeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ReferenceCard } from '@/components/reference/ReferenceCard'
+import { KakaoMap } from '@/components/map/KakaoMap'
 
 export function SpotDetailPage() {
   const { spotId } = useParams<{ spotId: string }>()
@@ -33,7 +34,7 @@ export function SpotDetailPage() {
   if (isError || !spot) {
     return (
       <div className="flex flex-1 flex-col">
-        <PageHeader title="Spot" />
+        <PageHeader title="스팟" />
         <ErrorState onRetry={() => refetch()} />
       </div>
     )
@@ -78,7 +79,7 @@ export function SpotDetailPage() {
             <p className="mt-1 text-sm font-medium text-neutral-900">{spot.recommendedTime ?? '정보 없음'}</p>
           </div>
           <div>
-            <p className="text-xs text-neutral-400">등록된 Reference</p>
+            <p className="text-xs text-neutral-400">등록된 참고 사진</p>
             <p className="mt-1 flex items-center gap-1 text-sm font-medium text-neutral-900">
               <Images size={14} />
               {spot.referenceCount}개
@@ -86,10 +87,14 @@ export function SpotDetailPage() {
           </div>
         </div>
 
+        <div className="relative h-44 w-full overflow-hidden rounded-2xl">
+          <KakaoMap spots={[spot]} selectedSpotId={spot.id} level={4} />
+        </div>
+
         {spot.description && <p className="text-sm leading-relaxed text-neutral-600">{spot.description}</p>}
 
         <div className="flex flex-col gap-3">
-          <h2 className="text-base font-semibold text-neutral-900">이 장소의 Reference</h2>
+          <h2 className="text-base font-semibold text-neutral-900">이 장소의 참고 사진</h2>
           {refsLoading && <CardGridSkeleton count={4} />}
           {!refsLoading && (!references || references.length === 0) && <EmptyState />}
           {!refsLoading && references && references.length > 0 && (
@@ -105,7 +110,7 @@ export function SpotDetailPage() {
       <StickyActionBar>
         <Button variant="secondary" fullWidth onClick={() => toggleSave(spot.id)}>
           <Heart size={16} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
-          {isSaved ? '저장됨' : 'Spot 저장'}
+          {isSaved ? '저장됨' : '스팟 저장'}
         </Button>
         <a
           href={directionsHref}

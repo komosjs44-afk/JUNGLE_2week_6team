@@ -39,7 +39,7 @@ export function RankingPage() {
       </header>
 
       <div className="flex items-center gap-2 px-4 py-3">
-        <span className="rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-medium text-neutral-500">
+        <span className="shrink-0 rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-medium whitespace-nowrap text-neutral-500">
           서울 전체
         </span>
         <div className="no-scrollbar flex gap-2 overflow-x-auto">

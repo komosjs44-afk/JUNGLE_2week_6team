@@ -16,7 +16,7 @@ export default defineConfig({
         name: 'RE:SHOT',
         short_name: 'RE:SHOT',
         description: '마음에 든 사진을, 직접 다시 찍다.',
-        theme_color: '#00c896',
+        theme_color: '#007a5e',
         background_color: '#f7faf9',
         display: 'standalone',
         start_url: '/',
