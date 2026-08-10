@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { Wand2, Download, ImagePlus } from 'lucide-react'
+import { Wand2, Download, ImagePlus, ArrowRight } from 'lucide-react'
 import type { AdjustmentRecipe } from '@/types'
 import { ADJUSTMENT_RANGES, DEFAULT_ADJUSTMENT_RECIPE } from '@/types'
 import { PageHeader } from '@/components/layout/PageHeader'
@@ -97,10 +97,19 @@ export function AiAdjustPage() {
       <PageHeader title="AI 색감 보정" />
 
       <div className="flex flex-col gap-4 px-4 py-4">
-        {/* 두 사진 업로드 */}
-        <div className="grid grid-cols-2 gap-3">
-          <PhotoSlot label="내 사진" url={myUrl} onClick={() => myInputRef.current?.click()} />
-          <PhotoSlot label="목표 색감" url={targetUrl} onClick={() => targetInputRef.current?.click()} />
+        {/* 두 사진 업로드: 목표 색감 → 내 사진 (목표 색을 내 사진에 적용) */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <PhotoSlot
+              label="목표 색감"
+              url={targetUrl}
+              onClick={() => targetInputRef.current?.click()}
+            />
+          </div>
+          <ArrowRight size={22} className="shrink-0 text-neutral-400" />
+          <div className="flex-1">
+            <PhotoSlot label="내 사진" url={myUrl} onClick={() => myInputRef.current?.click()} />
+          </div>
         </div>
         <input ref={myInputRef} type="file" accept="image/*" hidden onChange={pickMy} />
         <input ref={targetInputRef} type="file" accept="image/*" hidden onChange={pickTarget} />
