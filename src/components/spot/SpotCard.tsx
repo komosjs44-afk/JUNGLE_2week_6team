@@ -28,7 +28,7 @@ export function SpotCard({ spot }: { spot: Spot }) {
         <p className="truncate text-sm font-medium text-neutral-900">{spot.name}</p>
         <p className="flex items-center gap-1 truncate text-xs text-neutral-400">
           <Images size={11} />
-          Reference {spot.referenceCount}개
+          참고 사진 {spot.referenceCount}개
         </p>
       </div>
     </Link>

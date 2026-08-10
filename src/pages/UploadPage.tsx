@@ -27,7 +27,7 @@ export function UploadPage() {
       <div className="flex flex-1 flex-col gap-4 px-4 py-4">
         <div>
           <h1 className="text-lg font-bold text-neutral-900">사진을 선택해주세요</h1>
-          <p className="mt-1 text-sm text-neutral-400">촬영 정보를 자동으로 추출해 Reference를 만들어드려요.</p>
+          <p className="mt-1 text-sm text-neutral-400">촬영 정보를 자동으로 추출해 참고 사진을 만들어드려요.</p>
         </div>
 
         <input

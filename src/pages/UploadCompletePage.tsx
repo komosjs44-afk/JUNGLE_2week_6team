@@ -29,7 +29,7 @@ export function UploadCompletePage() {
 
       <div className="safe-bottom flex flex-col gap-2 px-4 pb-4">
         <Button variant="secondary" fullWidth onClick={() => exitTo('/my')}>
-          내 Reference 보기
+          내 참고 사진 보기
         </Button>
         <Button fullWidth onClick={() => exitTo('/')}>
           발견으로 이동

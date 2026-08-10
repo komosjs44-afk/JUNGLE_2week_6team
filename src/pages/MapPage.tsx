@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
 import { useSpots } from '@/hooks'
-import { MockMap } from '@/components/map/MockMap'
+import { KakaoMap } from '@/components/map/KakaoMap'
 import { SpotPreviewCard } from '@/components/map/SpotPreviewCard'
 import { Tag } from '@/components/common/Tag'
 import { ErrorState } from '@/components/common/ErrorState'
+import { EmptyState } from '@/components/common/EmptyState'
 
 const FILTERS = ['전체', '야경', '노을', '골목', '카페', '자연']
 
@@ -47,7 +48,13 @@ export function MapPage() {
         {isError ? (
           <ErrorState onRetry={() => refetch()} />
         ) : (
-          <MockMap spots={filteredSpots} selectedSpotId={selectedSpotId} onSelectSpot={setSelectedSpotId} />
+          <KakaoMap spots={filteredSpots} selectedSpotId={selectedSpotId} onSelectSpot={setSelectedSpotId} />
+        )}
+
+        {!isError && spots && filteredSpots.length === 0 && (
+          <div className="absolute inset-x-6 top-6 rounded-2xl bg-white shadow-lg shadow-black/5">
+            <EmptyState title="검색 결과가 없어요." description="다른 장소나 태그로 검색해보세요." />
+          </div>
         )}
 
         {selectedSpot && (

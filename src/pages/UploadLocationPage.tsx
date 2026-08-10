@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { ProgressBar } from '@/components/common/ProgressBar'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
-import { MockMap } from '@/components/map/MockMap'
+import { KakaoMap } from '@/components/map/KakaoMap'
 
 function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const R = 6371000
@@ -131,8 +131,8 @@ export function UploadLocationPage() {
         )}
 
         {pickerMode === 'map' && spots && (
-          <div className="h-72 overflow-hidden rounded-2xl">
-            <MockMap
+          <div className="relative h-72 overflow-hidden rounded-2xl">
+            <KakaoMap
               spots={spots}
               selectedSpotId={spotId}
               onSelectSpot={(id) => {
