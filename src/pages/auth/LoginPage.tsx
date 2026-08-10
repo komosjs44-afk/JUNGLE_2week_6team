@@ -21,7 +21,7 @@ export function LoginPage() {
 
     const errors: typeof fieldErrors = {}
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = '올바른 이메일 형식이 아니에요.'
-    if (password.length < 4) errors.password = '비밀번호는 4자 이상이어야 해요.'
+    if (password.length < 6) errors.password = '비밀번호는 6자 이상이어야 해요.'
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) return
 
@@ -53,7 +53,7 @@ export function LoginPage() {
         <Input
           label="비밀번호"
           type="password"
-          placeholder="4자 이상 입력해주세요"
+          placeholder="6자 이상 입력해주세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={fieldErrors.password}

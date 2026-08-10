@@ -2,11 +2,13 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { User } from '@/types'
 import { authService } from '@/services'
+import { getCurrentUser } from '@/repositories/supabase/authRepository'
 
 interface AuthState {
   user: User | null
   isLoading: boolean
   error: string | null
+  init: () => Promise<void>
   login: (email: string, password: string) => Promise<void>
   signup: (nickname: string, email: string, password: string) => Promise<void>
   logout: () => void
@@ -19,6 +21,12 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isLoading: false,
       error: null,
+
+      // 앱 시작 시 Supabase 세션과 동기화 (persist된 user를 실제 세션 기준으로 재확인)
+      init: async () => {
+        const user = await getCurrentUser()
+        set({ user })
+      },
 
       login: async (email, password) => {
         set({ isLoading: true, error: null })

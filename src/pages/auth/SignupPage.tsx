@@ -22,7 +22,7 @@ export function SignupPage() {
     const errors: Record<string, string> = {}
     if (nickname.trim().length < 2) errors.nickname = '닉네임은 2자 이상이어야 해요.'
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.email = '올바른 이메일 형식이 아니에요.'
-    if (password.length < 4) errors.password = '비밀번호는 4자 이상이어야 해요.'
+    if (password.length < 6) errors.password = '비밀번호는 6자 이상이어야 해요.'
     if (confirmPassword !== password) errors.confirmPassword = '비밀번호가 일치하지 않아요.'
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) return
@@ -58,7 +58,7 @@ export function SignupPage() {
         <Input
           label="비밀번호"
           type="password"
-          placeholder="4자 이상 입력해주세요"
+          placeholder="6자 이상 입력해주세요"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           error={fieldErrors.password}
