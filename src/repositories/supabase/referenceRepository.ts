@@ -155,10 +155,10 @@ export const supabaseReferenceRepository: ReferenceRepository = {
         .from('spots')
         .insert({
           name: input.newSpotName.trim(),
-          address: '',
+          address: input.newSpotAddress ?? '',
           image_url: input.imageUrl,
-          latitude: input.exif?.latitude ?? 0,
-          longitude: input.exif?.longitude ?? 0,
+          latitude: input.newSpotLat ?? input.exif?.latitude ?? 0,
+          longitude: input.newSpotLng ?? input.exif?.longitude ?? 0,
           tags: input.tags,
         })
         .select('id')

@@ -32,6 +32,8 @@ export function UploadInfoPage() {
     previewUrl,
     exif,
     spotId,
+    newSpotName,
+    manualLocation,
     direction,
     creatorTip,
     tags,
@@ -44,12 +46,15 @@ export function UploadInfoPage() {
   const { mutateAsync, isPending, error } = useCreateReference()
   const [isCompressing, setIsCompressing] = useState(false)
 
+  // 기존 스팟(spotId) 또는 새 장소(newSpotName+manualLocation) 중 하나는 있어야 함
+  const hasLocation = !!spotId || !!(newSpotName && manualLocation)
+
   useEffect(() => {
-    if (!file || !spotId) navigate('/upload', { replace: true })
-  }, [file, spotId, navigate])
+    if (!file || !hasLocation) navigate('/upload', { replace: true })
+  }, [file, hasLocation, navigate])
 
   async function handleSubmit() {
-    if (!user || !file || !previewUrl || !spotId) return
+    if (!user || !file || !previewUrl || !hasLocation) return
 
     setIsCompressing(true)
     const compressed = await compressImage(file)
@@ -59,7 +64,12 @@ export function UploadInfoPage() {
 
     await mutateAsync({
       userId: user.id,
-      spotId,
+      spotId: spotId ?? null,
+      // 기존 스팟이 없으면 새 장소로 생성
+      newSpotName: spotId ? undefined : newSpotName,
+      newSpotLat: spotId ? undefined : manualLocation?.lat,
+      newSpotLng: spotId ? undefined : manualLocation?.lng,
+      newSpotAddress: spotId ? undefined : manualLocation?.address,
       title: title.trim() || '제목 없는 참고 사진',
       imageUrl,
       tags,
