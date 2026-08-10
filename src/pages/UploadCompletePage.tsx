@@ -22,7 +22,7 @@ export function UploadCompletePage() {
           <CheckCircle2 size={32} />
         </div>
         <div>
-          <h1 className="text-lg font-bold text-neutral-900">Reference가 등록되었어요.</h1>
+          <h1 className="text-lg font-bold text-neutral-900">참고 사진이 등록되었어요.</h1>
           <p className="mt-1 text-sm text-neutral-400">다른 사용자들이 이 사진을 보고 따라 찍을 수 있어요.</p>
         </div>
       </div>
