@@ -35,3 +35,12 @@ export interface AuthRepository {
   signup(nickname: string, email: string, password: string): Promise<User>
   logout(): Promise<void>
 }
+
+export interface SaveRepository {
+  listSpotIds(userId: string): Promise<string[]>
+  listReferenceIds(userId: string): Promise<string[]>
+  addSpot(userId: string, spotId: string): Promise<void>
+  removeSpot(userId: string, spotId: string): Promise<void>
+  addReference(userId: string, referenceId: string): Promise<void>
+  removeReference(userId: string, referenceId: string): Promise<void>
+}
