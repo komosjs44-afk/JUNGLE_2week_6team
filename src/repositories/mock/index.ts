@@ -1,0 +1,5 @@
+export * from './referenceRepository'
+export * from './spotRepository'
+export * from './routeRepository'
+export * from './rankingRepository'
+export * from './authRepository'

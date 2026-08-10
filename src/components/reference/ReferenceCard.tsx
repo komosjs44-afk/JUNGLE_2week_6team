@@ -1,0 +1,43 @@
+import { Link } from 'react-router-dom'
+import { Heart } from 'lucide-react'
+import { clsx } from 'clsx'
+import type { Reference } from '@/types'
+import { useSaveStore } from '@/stores'
+import { formatLikeCount } from '@/utils/format'
+
+export function ReferenceCard({ reference }: { reference: Reference }) {
+  const isSaved = useSaveStore((s) => s.isReferenceSaved(reference.id))
+  const toggleSave = useSaveStore((s) => s.toggleReferenceSave)
+
+  return (
+    <Link to={`/references/${reference.id}`} className="group flex flex-col gap-2">
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-neutral-100">
+        <img
+          src={reference.imageUrl}
+          alt={reference.title}
+          loading="lazy"
+          className="h-full w-full object-cover transition-transform group-active:scale-[0.98]"
+        />
+        <button
+          type="button"
+          aria-label={isSaved ? '저장 취소' : '저장'}
+          onClick={(e) => {
+            e.preventDefault()
+            toggleSave(reference.id)
+          }}
+          className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm"
+        >
+          <Heart size={16} className={clsx(isSaved && 'fill-white')} />
+        </button>
+      </div>
+      <div className="flex flex-col gap-0.5">
+        <p className="truncate text-sm font-medium text-neutral-900">{reference.title}</p>
+        <p className="truncate text-xs text-neutral-400">{reference.spot.name}</p>
+        <div className="flex items-center gap-1 text-xs text-neutral-400">
+          <Heart size={11} />
+          <span>{formatLikeCount(reference.likeCount)}</span>
+        </div>
+      </div>
+    </Link>
+  )
+}
