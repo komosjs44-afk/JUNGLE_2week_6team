@@ -37,7 +37,7 @@ export function LoginPage() {
     <div className="flex flex-1 flex-col justify-center px-6 py-10">
       <div className="mb-10 text-center">
         <p className="mb-2 text-sm text-neutral-400">마음에 든 사진을, 직접 다시 찍다.</p>
-        <h1 className="text-3xl font-bold tracking-tight text-neutral-900">RE:SHOT</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-neutral-900">RE:FRAME</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
