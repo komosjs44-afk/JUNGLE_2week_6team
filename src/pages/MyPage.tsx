@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, Settings, Wand2, ChevronRight, Trash2 } from 'lucide-react'
 import { useAuthStore, useSaveStore } from '@/stores'
-import { useAllReferences, useSpots, useDeleteReference } from '@/hooks'
+import { useAllReferences, useSpots, useDeleteReference, useFollowCounts } from '@/hooks'
 import { Avatar } from '@/components/common/Avatar'
+import { ProfileStat } from '@/components/common/ProfileStat'
 import { Tabs } from '@/components/common/Tabs'
 import { Button } from '@/components/common/Button'
 import { IconButton } from '@/components/common/IconButton'
@@ -21,6 +22,8 @@ export function MyPage() {
   const { savedReferenceIds, savedSpotIds } = useSaveStore()
   const [tab, setTab] = useState<SaveTab>('reference')
   const deleteReference = useDeleteReference()
+  const { data: followCounts } = useFollowCounts(user?.id)
+  const myReferencesRef = useRef<HTMLDivElement>(null)
 
   const { data: allReferences, isLoading: refsLoading } = useAllReferences()
   const { data: allSpots, isLoading: spotsLoading } = useSpots()
@@ -53,25 +56,40 @@ export function MyPage() {
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-20 border-b border-neutral-100 bg-white/95 px-4 py-4 backdrop-blur">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar nickname={user.nickname} avatarUrl={user.avatarUrl} size={52} />
-            <div>
-              <p className="text-base font-bold text-neutral-900">{user.nickname}</p>
-              {user.bio && <p className="text-xs text-neutral-400">{user.bio}</p>}
-            </div>
+        <div className="flex items-center gap-4">
+          <Avatar nickname={user.nickname} avatarUrl={user.avatarUrl} size={72} />
+          <div className="flex flex-1 items-center justify-around text-center">
+            <ProfileStat
+              value={myReferences.length}
+              label="게시물"
+              onClick={() => myReferencesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            />
+            <ProfileStat
+              value={followCounts?.followers ?? 0}
+              label="팔로워"
+              onClick={() => navigate(`/users/${user.id}/followers`)}
+            />
+            <ProfileStat
+              value={followCounts?.following ?? 0}
+              label="팔로잉"
+              onClick={() => navigate(`/users/${user.id}/following`)}
+            />
           </div>
           <IconButton aria-label="계정 설정" onClick={() => navigate('/settings')}>
             <Settings size={20} />
           </IconButton>
         </div>
+        <div className="mt-3">
+          <p className="text-sm font-semibold text-neutral-900">{user.nickname}</p>
+          {user.bio && <p className="text-xs text-neutral-400">{user.bio}</p>}
+        </div>
       </header>
 
-      <div className="px-4 pt-4">
+      <div className="px-4 pt-3">
         <button
           type="button"
           onClick={() => navigate('/ai-adjust')}
-          className="flex w-full items-center justify-between rounded-2xl bg-neutral-900 px-4 py-3.5 text-white"
+          className="flex w-full items-center justify-between rounded-2xl bg-neutral-900 px-4 py-3 text-white"
         >
           <span className="flex items-center gap-2 text-sm font-medium">
             <Wand2 size={16} />
@@ -95,7 +113,7 @@ export function MyPage() {
           (refsLoading ? (
             <CardGridSkeleton />
           ) : savedReferences.length === 0 ? (
-            <EmptyState title="저장한 참고 사진이 없어요." />
+            <EmptyState title="저장한 참고 사진이 없어요." compact />
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {savedReferences.map((r) => (
@@ -108,7 +126,7 @@ export function MyPage() {
           (spotsLoading ? (
             <CardGridSkeleton />
           ) : savedSpots.length === 0 ? (
-            <EmptyState title="저장한 스팟이 없어요." />
+            <EmptyState title="저장한 스팟이 없어요." compact />
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {savedSpots.map((s) => (
@@ -118,12 +136,12 @@ export function MyPage() {
           ))}
       </div>
 
-      <div className="flex flex-col gap-3 px-4 py-4">
+      <div ref={myReferencesRef} className="flex flex-col gap-3 px-4 py-4">
         <h2 className="text-base font-semibold text-neutral-900">내가 등록한 참고 사진</h2>
         {refsLoading ? (
           <CardGridSkeleton count={2} />
         ) : myReferences.length === 0 ? (
-          <EmptyState title="아직 등록한 참고 사진이 없어요." description="첫 참고 사진을 업로드해보세요." />
+          <EmptyState title="아직 등록한 참고 사진이 없어요." description="첫 참고 사진을 업로드해보세요." compact />
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {myReferences.map((r) => (

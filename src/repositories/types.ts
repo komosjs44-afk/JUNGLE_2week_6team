@@ -5,6 +5,7 @@ import type {
   RankingEntry,
   RankingTab,
   User,
+  FollowCounts,
   NewReferenceInput,
   NewSpotInput,
 } from '@/types'
@@ -44,6 +45,16 @@ export interface AuthRepository {
   signup(nickname: string, email: string, password: string): Promise<User>
   logout(): Promise<void>
   updateProfile(userId: string, patch: ProfileUpdate): Promise<User>
+  getById(userId: string): Promise<User | null>
+}
+
+export interface FollowRepository {
+  listFollowingIds(userId: string): Promise<string[]>
+  listFollowers(userId: string): Promise<User[]>
+  listFollowing(userId: string): Promise<User[]>
+  follow(followerId: string, targetId: string): Promise<void>
+  unfollow(followerId: string, targetId: string): Promise<void>
+  getCounts(userId: string): Promise<FollowCounts>
 }
 
 export interface SaveRepository {

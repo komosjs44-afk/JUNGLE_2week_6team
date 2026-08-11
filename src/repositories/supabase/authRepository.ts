@@ -62,6 +62,12 @@ export const supabaseAuthRepository: AuthRepository = {
     await supabase.auth.signOut()
   },
 
+  async getById(userId) {
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+    if (error) throw error
+    return data ? toUser(data as ProfileRow) : null
+  },
+
   async updateProfile(userId, patch) {
     // RLS: 본인 프로필만 수정 가능 (profiles_update 정책)
     const { data, error } = await supabase

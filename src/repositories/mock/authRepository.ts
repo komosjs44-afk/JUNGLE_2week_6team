@@ -1,6 +1,6 @@
 import type { AuthRepository } from '../types'
 import type { User } from '@/types'
-import { CURRENT_USER } from '@/mocks'
+import { CURRENT_USER, getUserById } from '@/mocks'
 import { mockDelay } from './delay'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -29,6 +29,10 @@ export const mockAuthRepository: AuthRepository = {
 
   async logout() {
     return mockDelay(undefined, 150)
+  },
+
+  async getById(userId) {
+    return mockDelay(getUserById(userId) ?? null, 150)
   },
 
   async updateProfile(_userId, patch) {
