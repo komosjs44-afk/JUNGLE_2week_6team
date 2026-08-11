@@ -133,6 +133,22 @@ await supabase.from('notifications').update({ read: true }).eq('id', notifId)
 ## 10. 스팟 레퍼런스 개수
 `spots.reference_count` 컬럼이 트리거로 자동 유지돼요. 매핑에서 `referenceCount: row.reference_count` 로 읽으면 실제 값이 나옵니다 (더 이상 0 고정 아님).
 
+## 11. 파생 게시물 출처 (`source_reference_id`)
+다른 레퍼런스를 보고 "이 색감으로 보정" → 업로드한 게시물은 원본 id를 기록해요. (null=원본, 값=파생)
+```ts
+// 업로드 시 (파생이면 원본 id 전달)
+await supabase.from('references').insert({ /* ... */, source_reference_id: 원본id })
+
+// 상세: "참고한 레퍼런스" 카드 (원본 조인)
+await supabase.from('references')
+  .select('*, source:references!source_reference_id(*, creator:profiles!user_id(*))')
+  .eq('id', id).single()
+// data.source 있으면 파생, null이면 원본
+
+// 이 원본을 보고 만든 파생들
+await supabase.from('references').select('*').eq('source_reference_id', 원본id)
+```
+
 ---
 
 ## 역할 경계 요약
