@@ -96,18 +96,21 @@ export const supabaseRankingRepository: RankingRepository = {
       )
     }
 
-    const entries = spots.map((row) => {
-      const referenceCount = referenceCountBySpot.get(row.id) ?? 0
-      const likeCount = likeCountBySpot.get(row.id) ?? 0
+    const entries = spots
+      .map((row) => {
+        const referenceCount = referenceCountBySpot.get(row.id) ?? 0
+        const likeCount = likeCountBySpot.get(row.id) ?? 0
 
-      return {
-        rank: 0,
-        spot: toSpot(row, referenceCount),
-        tags: row.tags ?? [],
-        likeCount,
-        referenceCount,
-      }
-    })
+        return {
+          rank: 0,
+          spot: toSpot(row, referenceCount),
+          tags: row.tags ?? [],
+          likeCount,
+          referenceCount,
+        }
+      })
+      // 레퍼런스가 하나도 없는(전부 삭제된 포함) 스팟은 랭킹에서 제외
+      .filter((entry) => entry.referenceCount > 0)
 
     // 기존 더미 데이터의 랭킹 기준을 실제 DB에서도 동일하게 적용
     switch (tab) {
