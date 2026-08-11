@@ -18,6 +18,8 @@ interface UploadWizardState {
   newSpotName: string
 
   direction: number | null
+  /** 사용자가 자연어로 적는 촬영 위치 설명(예: "정문 맞은편에서 촬영"). */
+  locationDescription: string
   creatorTip: string
   tags: string[]
   title: string
@@ -41,6 +43,7 @@ interface UploadWizardState {
   setPhotoLocation: (location: PhotoLocation | null) => void
   setNewSpotName: (name: string) => void
   setDirection: (deg: number | null) => void
+  setLocationDescription: (text: string) => void
   setCreatorTip: (tip: string) => void
   toggleTag: (tag: string) => void
   setTitle: (title: string) => void
@@ -64,6 +67,7 @@ const initialState = {
   photoLocation: null,
   newSpotName: '',
   direction: null,
+  locationDescription: '',
   creatorTip: '',
   tags: [] as string[],
   title: '',
@@ -95,6 +99,7 @@ export const useUploadWizardStore = create<UploadWizardState>((set) => ({
         spotId: null,
         photoLocation: null,
         newSpotName: '',
+        locationDescription: '',
         adjustedFile: null,
         adjustedPreviewUrl: null,
         adjustmentRecipe: null,
@@ -110,6 +115,7 @@ export const useUploadWizardStore = create<UploadWizardState>((set) => ({
   setPhotoLocation: (photoLocation) => set({ photoLocation }),
   setNewSpotName: (newSpotName) => set({ newSpotName }),
   setDirection: (direction) => set({ direction }),
+  setLocationDescription: (text) => set({ locationDescription: text.slice(0, 150) }),
   setCreatorTip: (creatorTip) => set({ creatorTip: creatorTip.slice(0, 200) }),
   toggleTag: (tag) =>
     set((state) => {

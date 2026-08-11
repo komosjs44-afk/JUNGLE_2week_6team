@@ -15,6 +15,8 @@ export interface NewReferenceInput {
   aspectRatio?: number
   tags: string[]
   direction?: number
+  /** 촬영 지점을 자연어로 설명한 것(예: "정문 맞은편에서 촬영"). [Backend Required] DB 컬럼 추가 전까지는 저장되지 않음. */
+  locationDescription?: string
   creatorTip?: string
   exif?: ExifData
   /** 업로더가 공개하기로 한 보정값만 여기 담긴다 — 비공개면 아예 전달하지 않는다. */

@@ -184,6 +184,8 @@ export const supabaseReferenceRepository: ReferenceRepository = {
         exif: input.exif ?? null,
         adjustment: input.adjustment ?? null,
         source_reference_id: input.sourceReferenceId ?? null,
+        // [Backend Required] references.location_description 컬럼이 아직 없음 — 추가되면 아래 줄 주석 해제.
+        // location_description: input.locationDescription ?? null,
       })
       .select('id')
       .single()

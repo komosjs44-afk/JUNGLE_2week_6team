@@ -9,7 +9,6 @@ import { compressImage } from '@/features/upload/compressImage'
 import { uploadReferenceImage } from '@/features/upload/uploadImage'
 import { renderAdjustedBlob } from '@/utils/colorMatch'
 import { ASPECT_RATIO_PRESETS, cropToAspectRatio } from '@/utils/cropImage'
-import { RECOMMENDED_TAGS } from '@/mocks'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { ProgressBar } from '@/components/common/ProgressBar'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
@@ -21,16 +20,17 @@ import { UploadPhotoPreview } from '@/components/upload/UploadPhotoPreview'
 import { AdjustmentPreview } from '@/components/adjustment/AdjustmentPreview'
 import { AdjustmentSliders } from '@/components/adjustment/AdjustmentSliders'
 
-const DIRECTIONS: { label: string; degrees: number }[] = [
-  { label: '북', degrees: 0 },
-  { label: '북동', degrees: 45 },
-  { label: '동', degrees: 90 },
-  { label: '남동', degrees: 135 },
-  { label: '남', degrees: 180 },
-  { label: '남서', degrees: 225 },
-  { label: '서', degrees: 270 },
-  { label: '북서', degrees: 315 },
+// 자주 쓰는 태그만 기본 노출, 나머지는 카테고리별로 "+ 더보기"에서
+const PRIMARY_TAGS = ['노을', '야경', '인물', '풍경', '감성', '도시', '자연', '골목']
+
+const TAG_CATEGORIES: { category: string; tags: string[] }[] = [
+  { category: '시간/빛', tags: ['일출', '낮', '노을', '야경', '역광'] },
+  { category: '피사체', tags: ['인물', '풍경', '건축'] },
+  { category: '장소', tags: ['도시', '자연', '바다', '산', '공원', '골목', '카페', '실내', '한옥'] },
+  { category: '분위기', tags: ['감성', '레트로', '미니멀', '힙한'] },
 ]
+
+const ALL_KNOWN_TAGS = new Set([...PRIMARY_TAGS, ...TAG_CATEGORIES.flatMap((c) => c.tags)])
 
 export function UploadInfoPage() {
   const navigate = useNavigate()
@@ -46,6 +46,7 @@ export function UploadInfoPage() {
     photoLocation,
     newSpotName,
     direction,
+    locationDescription,
     creatorTip,
     tags,
     title,
@@ -53,7 +54,7 @@ export function UploadInfoPage() {
     adjustmentSource,
     adjustmentPublic,
     sourceReferenceId,
-    setDirection,
+    setLocationDescription,
     setCreatorTip,
     toggleTag,
     setTitle,
@@ -64,6 +65,12 @@ export function UploadInfoPage() {
   } = useUploadWizardStore()
   const { mutateAsync, isPending, error } = useCreateReference()
   const [isCompressing, setIsCompressing] = useState(false)
+  const [showAllTags, setShowAllTags] = useState(false)
+  const [showCustomTagInput, setShowCustomTagInput] = useState(false)
+  const [customTagValue, setCustomTagValue] = useState('')
+
+  // 미리 정의된 목록에 없는데 선택된 태그 = 사용자가 "+ 기타"로 직접 추가한 것
+  const customSelectedTags = tags.filter((t) => !ALL_KNOWN_TAGS.has(t))
 
   useEffect(() => {
     if (!file || (!spotId && !photoLocation)) navigate('/upload', { replace: true })
@@ -82,6 +89,13 @@ export function UploadInfoPage() {
   function handlePickOriginal() {
     setAdjustment(null, null)
     setAdjustmentPublic(false)
+  }
+
+  function handleAddCustomTag() {
+    const value = customTagValue.trim()
+    if (!value) return
+    toggleTag(value)
+    setCustomTagValue('')
   }
 
   async function handleSubmit() {
@@ -124,6 +138,7 @@ export function UploadInfoPage() {
       aspectRatio: finalAspectRatio,
       tags,
       direction: direction ?? undefined,
+      locationDescription: locationDescription.trim() || undefined,
       creatorTip: creatorTip.trim() || undefined,
       exif: exif ?? undefined,
       // 공개하지 않기로 했으면 보정값 자체를 아예 보내지 않는다 (opt-in)
@@ -152,44 +167,91 @@ export function UploadInfoPage() {
           />
         )}
 
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-neutral-700">촬영 방향</span>
-          <div className="grid grid-cols-4 gap-2">
-            {DIRECTIONS.map((d) => (
-              <button
-                key={d.degrees}
-                type="button"
-                onClick={() => setDirection(d.degrees)}
-                className={clsx(
-                  'min-h-[44px] rounded-xl border text-sm font-medium transition-colors',
-                  direction === d.degrees
-                    ? 'border-primary-600 bg-primary-600 text-white'
-                    : 'border-neutral-200 text-neutral-600',
-                )}
-              >
-                {d.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <Textarea
+          label="촬영 위치 설명"
+          placeholder="예) YBM 건물 정문 맞은편, 횡단보도 앞에서 촬영했어요."
+          maxLength={150}
+          value={locationDescription}
+          onChange={(e) => setLocationDescription(e.target.value)}
+        />
 
         <Textarea
-          label="기고자 팁"
-          placeholder="어떻게 촬영했는지 알려주세요 (최대 200자)"
+          label="나의 촬영 팁"
+          placeholder="사진을 비슷하게 찍을 수 있는 팁을 알려주세요."
           maxLength={200}
           value={creatorTip}
           onChange={(e) => setCreatorTip(e.target.value)}
         />
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <span className="text-sm font-medium text-neutral-700">태그 (최대 5개)</span>
           <div className="flex flex-wrap gap-2">
-            {RECOMMENDED_TAGS.map((t) => (
+            {PRIMARY_TAGS.map((t) => (
               <Tag key={t} as="button" selected={tags.includes(t)} onClick={() => toggleTag(t)}>
                 {t}
               </Tag>
             ))}
+            {customSelectedTags.map((t) => (
+              <Tag key={t} as="button" selected onClick={() => toggleTag(t)}>
+                {t}
+              </Tag>
+            ))}
+            {!showAllTags && (
+              <Tag as="button" onClick={() => setShowAllTags(true)}>
+                + 더보기
+              </Tag>
+            )}
           </div>
+
+          {showAllTags && (
+            <div className="flex flex-col gap-3">
+              {TAG_CATEGORIES.map(({ category, tags: categoryTags }) => {
+                const remaining = categoryTags.filter((t) => !PRIMARY_TAGS.includes(t))
+                if (remaining.length === 0) return null
+                return (
+                  <div key={category} className="flex flex-col gap-1.5">
+                    <span className="text-xs font-medium text-neutral-400">{category}</span>
+                    <div className="flex flex-wrap gap-2">
+                      {remaining.map((t) => (
+                        <Tag key={t} as="button" selected={tags.includes(t)} onClick={() => toggleTag(t)}>
+                          {t}
+                        </Tag>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
+
+              {!showCustomTagInput ? (
+                <Tag as="button" onClick={() => setShowCustomTagInput(true)} className="self-start">
+                  + 기타
+                </Tag>
+              ) : (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-xs font-medium text-neutral-400">직접 태그 입력</span>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={customTagValue}
+                      onChange={(e) => setCustomTagValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          handleAddCustomTag()
+                        }
+                      }}
+                      placeholder="예) 벚꽃"
+                      maxLength={10}
+                      className="h-11 min-w-0 flex-1 rounded-xl border border-neutral-200 bg-white px-4 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-primary-500"
+                    />
+                    <Button variant="secondary" onClick={handleAddCustomTag}>
+                      추가
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-3">
