@@ -10,7 +10,8 @@ import { Button } from '@/components/common/Button'
 export function UploadPage() {
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement>(null)
-  const { file, previewUrl, setFile, setExif } = useUploadWizardStore()
+  const { file, previewUrl, adjustedPreviewUrl, setFile, setExif } = useUploadWizardStore()
+  const displayUrl = adjustedPreviewUrl ?? previewUrl
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0]
@@ -38,13 +39,13 @@ export function UploadPage() {
           onChange={handleFileChange}
         />
 
-        {previewUrl ? (
+        {displayUrl ? (
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
             className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-neutral-100"
           >
-            <img src={previewUrl} alt="선택한 사진" className="h-full w-full object-cover" />
+            <img src={displayUrl} alt="선택한 사진" className="h-full w-full object-cover" />
             <span className="absolute right-2 bottom-2 rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white">
               다른 사진 선택
             </span>

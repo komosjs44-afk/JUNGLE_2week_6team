@@ -6,11 +6,13 @@ import { useUploadWizardStore } from '@/stores'
  */
 export function UploadPhotoPreview() {
   const previewUrl = useUploadWizardStore((s) => s.previewUrl)
-  if (!previewUrl) return null
+  const adjustedPreviewUrl = useUploadWizardStore((s) => s.adjustedPreviewUrl)
+  const displayUrl = adjustedPreviewUrl ?? previewUrl
+  if (!displayUrl) return null
   return (
     <div className="relative bg-neutral-100">
       <img
-        src={previewUrl}
+        src={displayUrl}
         alt="업로드할 사진"
         className="mx-auto block max-h-[75vh] w-full object-contain"
       />

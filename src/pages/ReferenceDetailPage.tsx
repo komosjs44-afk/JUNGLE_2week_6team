@@ -10,6 +10,7 @@ import { IconButton } from '@/components/common/IconButton'
 import { Tag } from '@/components/common/Tag'
 import { Avatar } from '@/components/common/Avatar'
 import { Accordion } from '@/components/common/Accordion'
+import { ADJUSTMENT_LABELS } from '@/types'
 import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { InfoRow } from '@/components/common/InfoRow'
@@ -115,6 +116,23 @@ export function ReferenceDetailPage() {
           </div>
         )}
 
+        {reference.adjustment && (
+          <div className="rounded-md border border-neutral-100 p-4">
+            <p className="mb-2 text-xs font-medium text-neutral-400">보정 정보</p>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+              {(Object.keys(ADJUSTMENT_LABELS) as (keyof typeof ADJUSTMENT_LABELS)[]).map((key) => (
+                <div key={key} className="flex items-center justify-between text-sm">
+                  <span className="text-neutral-500">{ADJUSTMENT_LABELS[key]}</span>
+                  <span className="font-medium tabular-nums text-neutral-900">
+                    {reference.adjustment![key] > 0 ? '+' : ''}
+                    {reference.adjustment![key]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {reference.exif && (
           <Accordion title="EXIF 상세 정보">
             <div className="flex flex-col gap-2 text-sm">
@@ -147,7 +165,13 @@ export function ReferenceDetailPage() {
             fullWidth
             onClick={() =>
               navigate('/ai-adjust', {
-                state: { targetUrl: reference.imageUrl, targetName: reference.title },
+                state: {
+                  referenceId: reference.id,
+                  targetUrl: reference.imageUrl,
+                  targetName: reference.title,
+                  creatorId: reference.creator.id,
+                  creatorName: reference.creator.nickname,
+                },
               })
             }
           >

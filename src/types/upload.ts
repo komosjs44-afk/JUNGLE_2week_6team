@@ -1,3 +1,4 @@
+import type { AdjustmentRecipe } from './adjustment'
 import type { ExifData } from './exif'
 import type { PhotoLocation } from './location'
 
@@ -14,4 +15,6 @@ export interface NewReferenceInput {
   direction?: number
   creatorTip?: string
   exif?: ExifData
+  /** 업로더가 공개하기로 한 보정값만 여기 담긴다 — 비공개면 아예 전달하지 않는다. */
+  adjustment?: AdjustmentRecipe
 }

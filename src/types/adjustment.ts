@@ -24,3 +24,12 @@ export const ADJUSTMENT_RANGES: Record<keyof AdjustmentRecipe, { min: number; ma
   saturation: { min: -50, max: 50, step: 1 },
   temperature: { min: -1000, max: 1000, step: 10 },
 }
+
+export const ADJUSTMENT_LABELS: Record<keyof AdjustmentRecipe, string> = {
+  exposure: '밝기',
+  contrast: '대비',
+  highlights: '하이라이트',
+  shadows: '섀도우',
+  saturation: '채도',
+  temperature: '색온도',
+}

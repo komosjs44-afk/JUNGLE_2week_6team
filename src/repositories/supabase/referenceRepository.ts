@@ -177,6 +177,7 @@ export const supabaseReferenceRepository: ReferenceRepository = {
         focal_length: input.exif?.focalLength ?? null,
         creator_tip: input.creatorTip ?? null,
         exif: input.exif ?? null,
+        adjustment: input.adjustment ?? null,
       })
       .select('id')
       .single()
