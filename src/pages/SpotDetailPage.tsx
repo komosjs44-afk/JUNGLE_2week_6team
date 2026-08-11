@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom'
 import { Heart, Images, MapPin, Navigation } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useSpot, useReferencesBySpot } from '@/hooks'
-import { useSaveStore } from '@/stores'
+import { useSaveStore, useMemberGateStore } from '@/stores'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
@@ -21,6 +21,7 @@ export function SpotDetailPage() {
   const { data: references, isLoading: refsLoading } = useReferencesBySpot(spotId)
   const isSaved = useSaveStore((s) => (spotId ? s.isSpotSaved(spotId) : false))
   const toggleSave = useSaveStore((s) => s.toggleSpotSave)
+  const requireMember = useMemberGateStore((s) => s.requireMember)
 
   if (isLoading) {
     return (
@@ -51,7 +52,7 @@ export function SpotDetailPage() {
           <PageHeader
             transparent
             right={
-              <IconButton variant="filled" aria-label={isSaved ? '저장 취소' : '저장'} onClick={() => toggleSave(spot.id)}>
+              <IconButton variant="filled" aria-label={isSaved ? '저장 취소' : '저장'} onClick={() => requireMember() && toggleSave(spot.id)}>
                 <Heart size={18} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
               </IconButton>
             }
@@ -108,7 +109,7 @@ export function SpotDetailPage() {
       </div>
 
       <StickyActionBar>
-        <Button variant="secondary" fullWidth onClick={() => toggleSave(spot.id)}>
+        <Button variant="secondary" fullWidth onClick={() => requireMember() && toggleSave(spot.id)}>
           <Heart size={16} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
           {isSaved ? '저장됨' : '스팟 저장'}
         </Button>

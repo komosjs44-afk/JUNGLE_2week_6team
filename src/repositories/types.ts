@@ -8,6 +8,8 @@ import type {
   FollowCounts,
   NewReferenceInput,
   NewSpotInput,
+  Comment,
+  NewCommentInput,
 } from '@/types'
 
 export type DiscoverTab = 'recommended' | 'popular' | 'nearby' | 'new'
@@ -55,6 +57,11 @@ export interface FollowRepository {
   follow(followerId: string, targetId: string): Promise<void>
   unfollow(followerId: string, targetId: string): Promise<void>
   getCounts(userId: string): Promise<FollowCounts>
+}
+
+export interface CommentRepository {
+  list(referenceId: string): Promise<Comment[]>
+  create(input: NewCommentInput): Promise<Comment>
 }
 
 export interface SaveRepository {
