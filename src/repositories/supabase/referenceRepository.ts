@@ -39,6 +39,7 @@ interface ReferenceRow {
   creator_tip: string | null
   exif: ExifData | null
   adjustment: AdjustmentRecipe | null
+  source_reference_id: string | null
   like_count: number
   comment_count: number
   created_at: string
@@ -83,6 +84,7 @@ function toReference(row: ReferenceRow): Reference | null {
     spotId: row.spot_id,
     title: row.title,
     imageUrl: row.image_url,
+    sourceReferenceId: row.source_reference_id ?? undefined,
     creator: toUser(row.creator),
     spot: toSpot(row.spot),
     tags: row.tags ?? [],
@@ -178,6 +180,7 @@ export const supabaseReferenceRepository: ReferenceRepository = {
         creator_tip: input.creatorTip ?? null,
         exif: input.exif ?? null,
         adjustment: input.adjustment ?? null,
+        source_reference_id: input.sourceReferenceId ?? null,
       })
       .select('id')
       .single()

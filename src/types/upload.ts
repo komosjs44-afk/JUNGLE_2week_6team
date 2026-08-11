@@ -17,4 +17,6 @@ export interface NewReferenceInput {
   exif?: ExifData
   /** 업로더가 공개하기로 한 보정값만 여기 담긴다 — 비공개면 아예 전달하지 않는다. */
   adjustment?: AdjustmentRecipe
+  /** AI 색감 재현으로 만들어진 경우, 참고한 원본 Reference id (일반 업로드는 항상 undefined) */
+  sourceReferenceId?: string
 }

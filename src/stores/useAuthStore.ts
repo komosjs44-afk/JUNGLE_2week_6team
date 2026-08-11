@@ -36,7 +36,8 @@ export const useAuthStore = create<AuthState>()(
           const user = await authService.login(email, password)
           set({ user, isLoading: false })
         } catch (err) {
-          set({ error: err instanceof Error ? err.message : '로그인에 실패했어요.', isLoading: false })
+          // 로그인 실패는 항상 비로그인 상태여야 함 — 이전에 남아있던 user가 있어도 지운다
+          set({ user: null, error: err instanceof Error ? err.message : '로그인에 실패했어요.', isLoading: false })
           throw err
         }
       },

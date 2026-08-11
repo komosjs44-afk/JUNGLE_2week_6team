@@ -42,16 +42,45 @@ async function toBase64(url: string): Promise<string> {
 
 const PROMPT = `너는 사진 색보정 전문가다.
 두 이미지가 주어진다: 첫 번째는 목표 톤(reference), 두 번째는 사용자의 원본(my photo).
-사용자의 사진을 reference의 색감/분위기에 가깝게 만드는 전역 보정값을 판단하라.
-반드시 아래 JSON 스키마로만, 설명 없이 답한다. 값은 지정 범위 안에서만.
-{
-  "exposure": number,     // -2 ~ 2   (밝기)
-  "contrast": number,     // -50 ~ 50 (대비)
-  "highlights": number,   // -100 ~ 100
-  "shadows": number,      // -100 ~ 100
-  "saturation": number,   // -50 ~ 50 (채도)
-  "temperature": number   // -1000 ~ 1000 (색온도, +따뜻 / -차가움)
-}`
+
+먼저 analysis 필드에 두 사진을 실제로 비교 관찰한 내용을 적어라 (짐작 금지, 본 대로 적을 것):
+- brightness: reference가 my photo보다 밝은지/어두운지, 체감 차이 정도
+- contrast: 명암 대비가 reference쪽이 센지/약한지
+- highlightsShadows: 밝은 영역과 어두운 영역의 디테일/톤 차이
+- saturation: reference의 채도가 더 높은지/낮은지
+- colorTemperature: reference가 my photo보다 따뜻한(노랑/주황) 톤인지 차가운(파랑) 톤인지
+
+그다음, 그 analysis 내용을 근거로만 숫자를 정한다 (analysis와 모순되는 숫자 금지):
+exposure -2~2(밝기), contrast -50~50(대비), highlights/shadows -100~100,
+saturation -50~50(채도), temperature -1000~1000(색온도, +따뜻/-차가움).
+0에 가까운 값은 "그 항목은 이미 비슷하다"는 뜻이니, analysis에서 차이가 없다고 판단했다면 실제로 0에 가깝게 써라.
+같은 두 사진 쌍이 다시 주어지면 항상 같은 analysis와 같은 숫자를 내야 한다.`
+
+// Gemini 구조화 출력 — analysis를 숫자보다 먼저 채우게 해서(스키마 순서) 모델이
+// 근거 없이 바로 숫자부터 찍는 걸 막는다. 키 누락·타입 오류·JSON 파싱 실패도 API 레벨에서 차단.
+const RESPONSE_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    analysis: {
+      type: 'OBJECT',
+      properties: {
+        brightness: { type: 'STRING' },
+        contrast: { type: 'STRING' },
+        highlightsShadows: { type: 'STRING' },
+        saturation: { type: 'STRING' },
+        colorTemperature: { type: 'STRING' },
+      },
+      required: ['brightness', 'contrast', 'highlightsShadows', 'saturation', 'colorTemperature'],
+    },
+    exposure: { type: 'NUMBER' },
+    contrast: { type: 'NUMBER' },
+    highlights: { type: 'NUMBER' },
+    shadows: { type: 'NUMBER' },
+    saturation: { type: 'NUMBER' },
+    temperature: { type: 'NUMBER' },
+  },
+  required: ['analysis', 'exposure', 'contrast', 'highlights', 'shadows', 'saturation', 'temperature'],
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
@@ -89,7 +118,12 @@ Deno.serve(async (req: Request) => {
               ],
             },
           ],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema: RESPONSE_SCHEMA,
+            // 0 = 같은 입력이면 항상 같은 값 (랜덤성 최소화 — 색보정은 창작이 아니라 판단이라 결정론이 맞다)
+            temperature: 0,
+          },
         }),
       },
     )

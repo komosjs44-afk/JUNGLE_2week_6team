@@ -24,6 +24,9 @@ interface UploadWizardState {
   adjustmentSource: 'ai' | 'manual' | null
   adjustmentPublic: boolean
 
+  // AI 색감 재현으로 시작된 경우, 참고한 원본 Reference id. 일반 업로드는 항상 null.
+  sourceReferenceId: string | null
+
   setFile: (file: File, previewUrl: string) => void
   setExif: (exif: ExifData | null, status: UploadWizardState['exifStatus']) => void
   setSpotId: (id: string | null) => void
@@ -38,6 +41,7 @@ interface UploadWizardState {
   /** AI 보정 결과(File+Preview+recipe)를 원자적으로 세팅 — AiAdjustPage 핸드오프 전용 */
   setAdjustedResult: (file: File, previewUrl: string, recipe: AdjustmentRecipe, source: 'ai' | 'manual') => void
   setAdjustmentPublic: (isPublic: boolean) => void
+  setSourceReferenceId: (id: string | null) => void
   reset: () => void
 }
 
@@ -58,6 +62,7 @@ const initialState = {
   adjustmentRecipe: null as AdjustmentRecipe | null,
   adjustmentSource: null as 'ai' | 'manual' | null,
   adjustmentPublic: false,
+  sourceReferenceId: null as string | null,
 }
 
 function revoke(url: string | null) {
@@ -83,6 +88,7 @@ export const useUploadWizardStore = create<UploadWizardState>((set) => ({
         adjustmentRecipe: null,
         adjustmentSource: null,
         adjustmentPublic: false,
+        sourceReferenceId: null,
       }
     }),
   setExif: (exif, exifStatus) => set({ exif, exifStatus }),
@@ -120,6 +126,7 @@ export const useUploadWizardStore = create<UploadWizardState>((set) => ({
       return { adjustedFile, adjustedPreviewUrl, adjustmentRecipe: recipe, adjustmentSource: source }
     }),
   setAdjustmentPublic: (adjustmentPublic) => set({ adjustmentPublic }),
+  setSourceReferenceId: (sourceReferenceId) => set({ sourceReferenceId }),
   reset: () =>
     set((state) => {
       revoke(state.adjustedPreviewUrl)
