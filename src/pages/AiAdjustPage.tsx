@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Wand2, Download, ImagePlus, ArrowRight } from 'lucide-react'
 import type { AdjustmentRecipe } from '@/types'
 import { ADJUSTMENT_RANGES, DEFAULT_ADJUSTMENT_RECIPE } from '@/types'
@@ -18,8 +19,11 @@ const LABELS: Record<keyof AdjustmentRecipe, string> = {
 }
 
 export function AiAdjustPage() {
+  const location = useLocation()
+  // 피드(레퍼런스 상세)에서 "이 색감으로 보정"으로 넘어온 경우, 그 사진을 목표 색감으로 사용
+  const initialTarget = (location.state as { targetUrl?: string } | null)?.targetUrl ?? null
   const [myUrl, setMyUrl] = useState<string | null>(null)
-  const [targetUrl, setTargetUrl] = useState<string | null>(null)
+  const [targetUrl, setTargetUrl] = useState<string | null>(initialTarget)
   const [recipe, setRecipe] = useState<AdjustmentRecipe>({ ...DEFAULT_ADJUSTMENT_RECIPE })
   const [showBefore, setShowBefore] = useState(false)
   const [matching, setMatching] = useState(false)

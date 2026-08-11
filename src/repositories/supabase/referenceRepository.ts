@@ -1,6 +1,7 @@
 import type { ReferenceRepository, DiscoverTab } from '../types'
 import type { Reference, Spot, User, ExifData, AdjustmentRecipe } from '@/types'
 import { supabase } from '@/lib/supabase'
+import { supabaseSpotRepository } from './spotRepository'
 
 interface SpotRow {
   id: string
@@ -147,23 +148,19 @@ export const supabaseReferenceRepository: ReferenceRepository = {
   },
 
   async create(input) {
-    // 장소 결정: 기존 spotId 우선, 없으면 새 장소 이름으로 생성
+    // 장소 결정: 기존 spotId 우선, 없으면 촬영 위치(photoLocation)로 새 장소 생성
     let spotId = input.spotId
     if (!spotId) {
-      if (!input.newSpotName?.trim()) throw new Error('장소를 선택하거나 새 장소 이름을 입력해주세요.')
-      const { data: newSpot, error: spotError } = await supabase
-        .from('spots')
-        .insert({
-          name: input.newSpotName.trim(),
-          address: input.newSpotAddress ?? '',
-          image_url: input.imageUrl,
-          latitude: input.newSpotLat ?? input.exif?.latitude ?? 0,
-          longitude: input.newSpotLng ?? input.exif?.longitude ?? 0,
-          tags: input.tags,
-        })
-        .select('id')
-        .single()
-      if (spotError) throw spotError
+      const loc = input.photoLocation
+      if (!loc) throw new Error('장소를 선택하거나 촬영 위치를 지정해주세요.')
+      const newSpot = await supabaseSpotRepository.create({
+        name: input.newSpotName?.trim() || loc.placeName || loc.address || '이름 없는 장소',
+        address: loc.address,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+        imageUrl: input.imageUrl,
+        tags: input.tags,
+      })
       spotId = newSpot.id
     }
 

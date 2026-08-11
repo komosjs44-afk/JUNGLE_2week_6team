@@ -1,5 +1,5 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Camera, Heart, MapPin, MessageCircle } from 'lucide-react'
+import { Camera, Heart, MapPin, MessageCircle, Wand2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useReference } from '@/hooks'
 import { useSaveStore } from '@/stores'
@@ -141,13 +141,28 @@ export function ReferenceDetailPage() {
       </div>
 
       <StickyActionBar>
-        <Button variant="secondary" fullWidth onClick={() => toggleSave(reference.id)}>
-          <Heart size={16} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
-          {isSaved ? '저장됨' : '저장'}
-        </Button>
-        <Button fullWidth onClick={() => navigate(`/references/${reference.id}/recreate`)}>
-          이 사진처럼 찍기
-        </Button>
+        <div className="flex flex-1 flex-col gap-2">
+          <Button
+            variant="ghost"
+            fullWidth
+            onClick={() =>
+              navigate('/ai-adjust', {
+                state: { targetUrl: reference.imageUrl, targetName: reference.title },
+              })
+            }
+          >
+            <Wand2 size={16} />이 색감으로 내 사진 보정
+          </Button>
+          <div className="flex gap-2">
+            <Button variant="secondary" fullWidth onClick={() => toggleSave(reference.id)}>
+              <Heart size={16} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
+              {isSaved ? '저장됨' : '저장'}
+            </Button>
+            <Button fullWidth onClick={() => navigate(`/references/${reference.id}/recreate`)}>
+              이 사진처럼 찍기
+            </Button>
+          </div>
+        </div>
       </StickyActionBar>
     </div>
   )

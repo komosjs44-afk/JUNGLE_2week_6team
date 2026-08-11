@@ -51,4 +51,22 @@ export const supabaseSpotRepository: SpotRepository = {
     if (error) throw error
     return data ? toSpot(data as SpotRow) : null
   },
+
+  async create(input) {
+    // RLS: 로그인 사용자만 생성 가능 (spots_insert 정책)
+    const { data, error } = await supabase
+      .from('spots')
+      .insert({
+        name: input.name,
+        address: input.address ?? '',
+        image_url: input.imageUrl,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        tags: input.tags ?? [],
+      })
+      .select('*')
+      .single()
+    if (error) throw error
+    return toSpot(data as SpotRow)
+  },
 }
