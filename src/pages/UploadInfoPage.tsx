@@ -49,6 +49,7 @@ export function UploadInfoPage() {
     adjustmentRecipe,
     adjustmentSource,
     adjustmentPublic,
+    sourceReferenceId,
     setDirection,
     setCreatorTip,
     toggleTag,
@@ -111,6 +112,7 @@ export function UploadInfoPage() {
       exif: exif ?? undefined,
       // 공개하지 않기로 했으면 보정값 자체를 아예 보내지 않는다 (opt-in)
       adjustment: adjustmentPublic ? (adjustmentRecipe ?? undefined) : undefined,
+      sourceReferenceId: sourceReferenceId ?? undefined,
     })
 
     navigate('/upload/complete')

@@ -26,6 +26,7 @@ export function AiAdjustPage() {
   const user = useAuthStore((s) => s.user)
   const setWizardFile = useUploadWizardStore((s) => s.setFile)
   const setWizardAdjustedResult = useUploadWizardStore((s) => s.setAdjustedResult)
+  const setWizardSourceReferenceId = useUploadWizardStore((s) => s.setSourceReferenceId)
   const resetWizard = useUploadWizardStore((s) => s.reset)
 
   // 피드(레퍼런스 상세)에서 "이 색감으로 보정"으로 넘어온 경우, 그 레퍼런스가 목표 색감으로 고정된다
@@ -146,6 +147,8 @@ export function AiAdjustPage() {
       resetWizard()
       setWizardFile(myFile, myUrl)
       setWizardAdjustedResult(adjustedFile, adjustedUrl, recipe, 'ai')
+      // ReferenceDetailPage가 여기로 넘길 때 referenceId를 항상 "실제 색감 기준(root) Reference"의 id로 채워준다
+      setWizardSourceReferenceId(navState?.referenceId ?? null)
       navigate('/upload/exif')
     } catch (err) {
       setError(err instanceof Error ? err.message : '보정 이미지를 준비하지 못했어요.')

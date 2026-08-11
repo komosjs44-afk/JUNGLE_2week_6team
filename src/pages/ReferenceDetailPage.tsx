@@ -1,7 +1,7 @@
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { Camera, Heart, MapPin, MessageCircle, Wand2 } from 'lucide-react'
+import { Camera, ChevronRight, Heart, MapPin, MessageCircle, Wand2 } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useReference } from '@/hooks'
+import { useReference, useRootReference } from '@/hooks'
 import { useSaveStore } from '@/stores'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
@@ -21,6 +21,7 @@ export function ReferenceDetailPage() {
   const { referenceId } = useParams<{ referenceId: string }>()
   const navigate = useNavigate()
   const { data: reference, isLoading, isError, refetch } = useReference(referenceId)
+  const { data: rootReference, isLoading: rootLoading, isDerived } = useRootReference(reference)
   const isSaved = useSaveStore((s) => (referenceId ? s.isReferenceSaved(referenceId) : false))
   const toggleSave = useSaveStore((s) => s.toggleReferenceSave)
 
@@ -102,6 +103,35 @@ export function ReferenceDetailPage() {
           ))}
         </div>
 
+        {isDerived && (
+          <div className="flex flex-col gap-1">
+            <span className="text-[11px] font-medium text-neutral-400">참고한 레퍼런스</span>
+            {rootReference ? (
+              <Link
+                to={`/references/${rootReference.id}`}
+                className="flex items-center gap-3 rounded-md border border-neutral-100 p-3"
+              >
+                <img
+                  src={rootReference.imageUrl}
+                  alt={rootReference.title}
+                  className="h-14 w-14 shrink-0 rounded-md object-cover"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-neutral-900">{rootReference.title}</p>
+                  <p className="truncate text-xs text-neutral-400">by {rootReference.creator.nickname}</p>
+                </div>
+                <ChevronRight size={16} className="shrink-0 text-neutral-300" />
+              </Link>
+            ) : rootLoading ? (
+              <Skeleton className="h-[70px] w-full rounded-md" />
+            ) : (
+              <p className="rounded-md border border-neutral-100 p-3 text-sm text-neutral-400">
+                참고한 레퍼런스를 불러올 수 없습니다.
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="divide-y divide-neutral-100">
           <InfoRow label="촬영 위치" value={reference.spot.name} />
           <InfoRow label="촬영 시간" value={timeLabel} />
@@ -163,19 +193,24 @@ export function ReferenceDetailPage() {
           <Button
             variant="ghost"
             fullWidth
+            disabled={!rootReference}
             onClick={() =>
+              rootReference &&
               navigate('/ai-adjust', {
                 state: {
-                  referenceId: reference.id,
-                  targetUrl: reference.imageUrl,
-                  targetName: reference.title,
-                  creatorId: reference.creator.id,
-                  creatorName: reference.creator.nickname,
+                  referenceId: rootReference.id,
+                  targetUrl: rootReference.imageUrl,
+                  targetName: rootReference.title,
+                  creatorId: rootReference.creator.id,
+                  creatorName: rootReference.creator.nickname,
                 },
               })
             }
           >
-            <Wand2 size={16} />이 색감으로 내 사진 보정
+            <Wand2 size={16} className="shrink-0" />
+            <span className="min-w-0 truncate">
+              {isDerived && rootReference ? `${rootReference.title} 색감으로 보정` : '이 색감으로 내 사진 보정'}
+            </span>
           </Button>
           <div className="flex gap-2">
             <Button variant="secondary" fullWidth onClick={() => toggleSave(reference.id)}>
