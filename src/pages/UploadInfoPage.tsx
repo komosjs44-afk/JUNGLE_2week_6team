@@ -8,6 +8,7 @@ import { useCreateReference } from '@/hooks'
 import { compressImage } from '@/features/upload/compressImage'
 import { uploadReferenceImage } from '@/features/upload/uploadImage'
 import { renderAdjustedBlob } from '@/utils/colorMatch'
+import { ASPECT_RATIO_PRESETS, cropToAspectRatio } from '@/utils/cropImage'
 import { RECOMMENDED_TAGS } from '@/mocks'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { ProgressBar } from '@/components/common/ProgressBar'
@@ -38,6 +39,8 @@ export function UploadInfoPage() {
     file,
     previewUrl,
     adjustedFile,
+    naturalAspectRatio,
+    aspectRatioOption,
     exif,
     spotId,
     photoLocation,
@@ -93,6 +96,18 @@ export function UploadInfoPage() {
         type: 'image/jpeg',
       })
     }
+
+    // 비율: 원본을 골랐으면 자르지 않고 원본 비율 그대로, 프리셋을 골랐으면 그 비율로 중앙 크롭
+    const targetRatio = ASPECT_RATIO_PRESETS[aspectRatioOption]
+    let finalAspectRatio = naturalAspectRatio ?? undefined
+    if (targetRatio) {
+      const sourceUrl = URL.createObjectURL(sourceFile)
+      const croppedBlob = await cropToAspectRatio(sourceUrl, targetRatio)
+      URL.revokeObjectURL(sourceUrl)
+      sourceFile = new File([croppedBlob], sourceFile.name || 'photo.jpg', { type: 'image/jpeg' })
+      finalAspectRatio = targetRatio
+    }
+
     const compressed = await compressImage(sourceFile)
     // 임시 blob URL 대신 Storage에 업로드해서 영구 public URL 사용
     const imageUrl = await uploadReferenceImage(compressed, user.id)
@@ -106,6 +121,7 @@ export function UploadInfoPage() {
       newSpotName: spotId ? undefined : newSpotName.trim() || undefined,
       title: title.trim() || '제목 없는 참고 사진',
       imageUrl,
+      aspectRatio: finalAspectRatio,
       tags,
       direction: direction ?? undefined,
       creatorTip: creatorTip.trim() || undefined,

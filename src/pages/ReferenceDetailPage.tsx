@@ -50,7 +50,10 @@ export function ReferenceDetailPage() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="relative aspect-[3/4] w-full shrink-0 bg-neutral-100">
+      <div
+        style={{ aspectRatio: reference.aspectRatio ?? 3 / 4 }}
+        className="relative w-full max-h-[80vh] shrink-0 bg-neutral-100"
+      >
         <img src={reference.imageUrl} alt={reference.title} className="h-full w-full object-cover" />
         <div className="absolute inset-x-0 top-0">
           <PageHeader

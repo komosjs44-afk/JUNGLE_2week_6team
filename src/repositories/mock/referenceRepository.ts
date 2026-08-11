@@ -71,6 +71,7 @@ export const mockReferenceRepository: ReferenceRepository = {
       spotId: spot.id,
       title: input.title,
       imageUrl: input.imageUrl,
+      aspectRatio: input.aspectRatio,
       creator,
       spot,
       tags: input.tags,
