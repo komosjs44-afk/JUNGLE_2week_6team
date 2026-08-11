@@ -70,7 +70,7 @@ Deno.serve(async (req: Request) => {
 
     const apiKey = Deno.env.get('GEMINI_API_KEY')
     if (!apiKey) throw new Error('GEMINI_API_KEY 시크릿이 설정되지 않았어요.')
-    const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.0-flash'
+    const model = Deno.env.get('GEMINI_MODEL') ?? 'gemini-2.5-flash'
 
     const [refB64, myB64] = await Promise.all([toBase64(referenceUrl), toBase64(myPhotoUrl)])
 
