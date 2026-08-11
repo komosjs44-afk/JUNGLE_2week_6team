@@ -2,6 +2,7 @@ import type { User } from './user'
 import type { Spot } from './spot'
 import type { ExifData } from './exif'
 import type { AdjustmentRecipe } from './adjustment'
+import type { AiShootingGuide } from './aiShootingGuide'
 
 export interface Reference {
   id: string
@@ -31,6 +32,9 @@ export interface Reference {
   exif?: ExifData
 
   adjustment?: AdjustmentRecipe
+
+  /** Gemini가 생성해 캐싱해둔 "따라 찍기" 가이드(있으면 재사용, 없으면 아직 생성 안 됨) */
+  aiShootingGuide?: AiShootingGuide
 
   likeCount: number
   commentCount: number

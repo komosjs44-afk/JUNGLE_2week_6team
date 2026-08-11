@@ -10,6 +10,7 @@ import type {
   NewSpotInput,
   Comment,
   NewCommentInput,
+  AiShootingGuide,
 } from '@/types'
 
 export type DiscoverTab = 'recommended' | 'popular' | 'nearby' | 'new'
@@ -20,6 +21,8 @@ export interface ReferenceRepository {
   getBySpotId(spotId: string): Promise<Reference[]>
   create(input: NewReferenceInput): Promise<Reference>
   remove(id: string): Promise<void>
+  /** AI 촬영 가이드를 캐싱한다 — 컬럼이 아직 없어도 조용히 실패할 뿐 절대 throw하지 않는다. */
+  saveShootingGuide(id: string, guide: AiShootingGuide): Promise<void>
 }
 
 export interface ProfileUpdate {

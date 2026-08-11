@@ -1,5 +1,5 @@
 import type { ReferenceRepository, DiscoverTab } from '../types'
-import type { Reference, Spot, User, ExifData, AdjustmentRecipe } from '@/types'
+import type { Reference, Spot, User, ExifData, AdjustmentRecipe, AiShootingGuide } from '@/types'
 import { supabase } from '@/lib/supabase'
 import { supabaseSpotRepository } from './spotRepository'
 
@@ -41,6 +41,8 @@ interface ReferenceRow {
   exif: ExifData | null
   adjustment: AdjustmentRecipe | null
   source_reference_id: string | null
+  // [Backend Required] 컬럼이 아직 없으면 PostgREST가 이 키를 안 주므로 undefined — 안전하게 optional 처리
+  shooting_guide?: AiShootingGuide | null
   like_count: number
   comment_count: number
   created_at: string
@@ -98,6 +100,7 @@ function toReference(row: ReferenceRow): Reference | null {
     },
     exif: row.exif ?? undefined,
     adjustment: row.adjustment ?? undefined,
+    aiShootingGuide: row.shooting_guide ?? undefined,
     likeCount: row.like_count,
     commentCount: row.comment_count,
     createdAt: row.created_at,
@@ -200,5 +203,13 @@ export const supabaseReferenceRepository: ReferenceRepository = {
     // RLS: 본인 것만 삭제 가능 (references_delete 정책)
     const { error } = await supabase.from('references').delete().eq('id', id)
     if (error) throw error
+  },
+
+  async saveShootingGuide(id, guide) {
+    // [Backend Required] references.shooting_guide 컬럼이 아직 없을 수 있음 — docs/supabase-shooting-guide.sql 참고.
+    // 컬럼이 없어도 화면엔 이미 생성된 가이드가 보이고 있으므로, 캐시 저장 실패가
+    // 사용자 경험을 깨지 않도록 절대 throw하지 않고 조용히 무시한다.
+    const { error } = await supabase.from('references').update({ shooting_guide: guide }).eq('id', id)
+    if (error) console.warn('[shooting-guide] 캐시 저장 실패(컬럼 미존재 가능):', error.message)
   },
 }

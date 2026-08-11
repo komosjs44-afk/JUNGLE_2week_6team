@@ -96,4 +96,10 @@ export const mockReferenceRepository: ReferenceRepository = {
     if (idx >= 0) store.splice(idx, 1)
     return mockDelay(undefined, 200)
   },
+
+  async saveShootingGuide(id, guide) {
+    const reference = store.find((r) => r.id === id)
+    if (reference) reference.aiShootingGuide = guide
+    return mockDelay(undefined, 200)
+  },
 }

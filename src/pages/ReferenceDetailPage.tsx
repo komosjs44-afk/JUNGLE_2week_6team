@@ -15,6 +15,7 @@ import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { InfoRow } from '@/components/common/InfoRow'
 import { CommentSection } from '@/components/reference/CommentSection'
+import { AiShootingGuide } from '@/components/reference/AiShootingGuide'
 import { formatDirection } from '@/utils/direction'
 import { formatDaypart, formatFocalLength, formatLikeCount, formatTimeOfDay } from '@/utils/format'
 
@@ -191,6 +192,10 @@ export function ReferenceDetailPage() {
             </div>
           </Accordion>
         )}
+
+        <div className="border-t border-neutral-100 pt-4">
+          <AiShootingGuide reference={reference} />
+        </div>
 
         <div className="border-t border-neutral-100 pt-4">
           <CommentSection referenceId={reference.id} />
