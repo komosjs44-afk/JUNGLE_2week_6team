@@ -42,16 +42,25 @@ async function toBase64(url: string): Promise<string> {
 
 const PROMPT = `너는 사진 색보정 전문가다.
 두 이미지가 주어진다: 첫 번째는 목표 톤(reference), 두 번째는 사용자의 원본(my photo).
+두 사진의 밝기·대비·하이라이트/섀도 균형·채도·색온도 차이를 비교해서,
 사용자의 사진을 reference의 색감/분위기에 가깝게 만드는 전역 보정값을 판단하라.
-반드시 아래 JSON 스키마로만, 설명 없이 답한다. 값은 지정 범위 안에서만.
-{
-  "exposure": number,     // -2 ~ 2   (밝기)
-  "contrast": number,     // -50 ~ 50 (대비)
-  "highlights": number,   // -100 ~ 100
-  "shadows": number,      // -100 ~ 100
-  "saturation": number,   // -50 ~ 50 (채도)
-  "temperature": number   // -1000 ~ 1000 (색온도, +따뜻 / -차가움)
-}`
+같은 두 사진 쌍에는 항상 같은 값을 내야 한다 (추측이 아니라 측정하듯 판단할 것).
+exposure: -2~2(밝기), contrast: -50~50(대비), highlights/shadows: -100~100,
+saturation: -50~50(채도), temperature: -1000~1000(색온도, +따뜻/-차가움).`
+
+// Gemini 구조화 출력 — 키 누락·타입 오류·JSON 파싱 실패 가능성을 API 레벨에서 차단
+const RESPONSE_SCHEMA = {
+  type: 'OBJECT',
+  properties: {
+    exposure: { type: 'NUMBER' },
+    contrast: { type: 'NUMBER' },
+    highlights: { type: 'NUMBER' },
+    shadows: { type: 'NUMBER' },
+    saturation: { type: 'NUMBER' },
+    temperature: { type: 'NUMBER' },
+  },
+  required: ['exposure', 'contrast', 'highlights', 'shadows', 'saturation', 'temperature'],
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: CORS })
@@ -89,7 +98,12 @@ Deno.serve(async (req: Request) => {
               ],
             },
           ],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0.2 },
+          generationConfig: {
+            responseMimeType: 'application/json',
+            responseSchema: RESPONSE_SCHEMA,
+            // 0 = 같은 입력이면 항상 같은 값 (랜덤성 최소화 — 색보정은 창작이 아니라 판단이라 결정론이 맞다)
+            temperature: 0,
+          },
         }),
       },
     )
