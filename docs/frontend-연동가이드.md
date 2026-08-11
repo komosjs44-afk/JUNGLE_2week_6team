@@ -108,6 +108,31 @@ await supabase.from('edit_results').insert({
 })
 ```
 
+## 9. 좋아요 · 댓글 · 알림 (신규)
+`like_count`/`comment_count`는 **트리거가 자동 유지**하니 직접 건드리지 마세요.
+```ts
+// 좋아요 / 취소
+await supabase.from('likes').insert({ user_id: me, reference_id })
+await supabase.from('likes').delete().match({ user_id: me, reference_id })
+// 내가 좋아요한 레퍼런스 id 목록
+await supabase.from('likes').select('reference_id').eq('user_id', me)
+
+// 댓글 목록 (작성자 조인) / 작성
+await supabase.from('comments')
+  .select('*, author:profiles!user_id(nickname, avatar_url)')
+  .eq('reference_id', id).order('created_at')
+await supabase.from('comments').insert({ reference_id, user_id: me, body })
+
+// 알림 (팔로우·좋아요·댓글이 오면 자동 생성됨)
+await supabase.from('notifications')
+  .select('*, actor:profiles!actor_id(nickname, avatar_url)')
+  .order('created_at', { ascending: false })
+await supabase.from('notifications').update({ read: true }).eq('id', notifId)
+```
+
+## 10. 스팟 레퍼런스 개수
+`spots.reference_count` 컬럼이 트리거로 자동 유지돼요. 매핑에서 `referenceCount: row.reference_count` 로 읽으면 실제 값이 나옵니다 (더 이상 0 고정 아님).
+
 ---
 
 ## 역할 경계 요약
