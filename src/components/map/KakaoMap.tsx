@@ -67,6 +67,8 @@ interface KakaoMapProps {
   initialCenter?: { latitude: number; longitude: number } | null
   /** A manually tapped/searched point that isn't necessarily a registered spot. */
   pickedLocation?: { latitude: number; longitude: number } | null
+  /** Recenters the camera whenever this changes (no marker) — e.g. tapping a search result. */
+  focusLocation?: { latitude: number; longitude: number } | null
   /** Fires with the tapped coordinates when the map is clicked. */
   onMapClick?: (lat: number, lng: number) => void
 }
@@ -79,6 +81,7 @@ export function KakaoMap({
   currentLocation = null,
   initialCenter = null,
   pickedLocation = null,
+  focusLocation = null,
   onMapClick,
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -193,6 +196,12 @@ export function KakaoMap({
     })
     pickedLocationOverlayRef.current.setMap(mapRef.current)
   }, [status, pickedLocation])
+
+  // 검색 결과 선택 등으로 카메라만 이동 (마커 없음)
+  useEffect(() => {
+    if (status !== 'ready' || !mapRef.current || !focusLocation) return
+    mapRef.current.setCenter(new window.kakao.maps.LatLng(focusLocation.latitude, focusLocation.longitude))
+  }, [status, focusLocation])
 
   useEffect(() => {
     if (status !== 'ready' || !mapRef.current) return
