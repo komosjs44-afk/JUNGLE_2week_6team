@@ -89,7 +89,7 @@ export function ReferenceDetailPage() {
 
         <div className="flex flex-col gap-1">
           <span className="text-[11px] font-medium text-neutral-400">기고자</span>
-          <Link to={`/my`} className="flex items-center gap-2">
+          <Link to={`/users/${reference.creator.id}`} className="flex items-center gap-2">
             <Avatar nickname={reference.creator.nickname} avatarUrl={reference.creator.avatarUrl} size={28} />
             <span className="text-sm font-medium text-neutral-700">{reference.creator.nickname}</span>
           </Link>

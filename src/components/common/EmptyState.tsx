@@ -28,6 +28,8 @@ interface EmptyStateProps {
   icon?: ReactNode
   actionLabel?: string
   onAction?: () => void
+  /** 콘텐츠 사이에 끼는 부분 empty state용 — 고정 py-16 대신 최소 여백만 사용 */
+  compact?: boolean
 }
 
 export function EmptyState({
@@ -36,9 +38,15 @@ export function EmptyState({
   icon,
   actionLabel,
   onAction,
+  compact = false,
 }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center gap-3 px-6 py-16 text-center">
+    <div
+      className={clsx(
+        'flex flex-col items-center gap-3 text-center',
+        compact ? 'px-4 py-6' : 'px-6 py-16',
+      )}
+    >
       <StateIcon icon={icon ?? <ImageOff size={24} />} />
       <p className="text-sm font-medium text-neutral-700">{title}</p>
       {description && <p className="text-xs text-neutral-400">{description}</p>}

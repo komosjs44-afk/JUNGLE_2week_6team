@@ -7,3 +7,8 @@ export interface User {
   website?: string
   createdAt?: string
 }
+
+export interface FollowCounts {
+  followers: number
+  following: number
+}
