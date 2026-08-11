@@ -9,7 +9,7 @@ export function LoginPage() {
   const location = useLocation()
   const { login, isLoading, error, clearError } = useAuthStore()
 
-  const [email, setEmail] = useState('test@example.com')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({})
 
