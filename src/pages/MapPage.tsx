@@ -93,8 +93,8 @@ export function MapPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="relative z-30 flex flex-col gap-3 border-b border-neutral-100 px-4 py-3">
-        <div className="flex h-11 items-center gap-2 rounded-xl bg-neutral-100 px-3">
-          <Search size={16} className="text-neutral-400" />
+        <div className="flex h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3">
+          <Search size={16} className="text-primary-700" />
           <input
             value={search}
             onChange={(e) => {

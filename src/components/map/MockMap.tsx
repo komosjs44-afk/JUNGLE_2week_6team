@@ -55,11 +55,13 @@ export function MockMap({ spots, selectedSpotId, onSelectSpot }: MockMapProps) {
             >
               <div
                 className={clsx(
-                  'flex h-9 w-9 items-center justify-center rounded-full shadow-md',
-                  isSelected ? 'bg-primary-600 text-white' : 'bg-white text-primary-600',
+                  'flex h-9 w-9 items-center justify-center rounded-full',
+                  isSelected
+                    ? 'border-2 border-white bg-primary-600 text-white shadow-md'
+                    : 'border border-neutral-200 bg-primary-50 text-primary-700 shadow-sm',
                 )}
               >
-                <MapPin size={18} fill="currentColor" className={isSelected ? 'text-white' : 'text-primary-600'} />
+                <MapPin size={18} fill="currentColor" className={isSelected ? 'text-white' : 'text-primary-700'} />
               </div>
             </div>
           </button>

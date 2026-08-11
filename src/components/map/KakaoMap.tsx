@@ -3,22 +3,30 @@ import type { DeviceLocation, Spot } from '@/types'
 import { loadKakaoMaps } from '@/features/map/kakaoMapsLoader'
 import { MockMap } from './MockMap'
 
+// RE:FRAME 브랜드 팔레트 — 마커는 Kakao SDK가 DOM으로 직접 그리므로 CSS 토큰 대신 값으로 고정한다.
+const BRAND = {
+  primary: '#007F6D', // Primary Green — 선택/현재위치 강조
+  deep: '#006B5B', // Deep Green — 아이콘/기본 강조
+  mint: '#EAF4F1', // Soft Mint — 기본 마커 배경
+  border: '#DCE8E4', // Border
+} as const
+
 const PIN_SVG =
   '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg>'
 
 // Distinct from spot pins (no label, centered dot instead of base-anchored pin) so it always
-// reads as "you are here" rather than another photo spot.
+// reads as "you are here" rather than another photo spot. RE:FRAME 그린으로 통일 — 바깥 반투명
+// 링 + 중앙 딥그린 점으로 현재 위치임을 명확히 보이게 한다(파란 기본 마커 사용 안 함).
 function createCurrentLocationContent(): HTMLElement {
   const wrapper = document.createElement('div')
-  wrapper.style.cssText = 'position:relative;width:18px;height:18px;'
+  wrapper.style.cssText = 'position:relative;width:16px;height:16px;'
 
   const halo = document.createElement('div')
   halo.style.cssText =
-    'position:absolute;inset:-9px;border-radius:9999px;background:rgba(59,130,246,0.25);'
+    'position:absolute;inset:-10px;border-radius:9999px;background:rgba(0,127,109,0.16);border:1px solid rgba(0,127,109,0.28);'
 
   const dot = document.createElement('div')
-  dot.style.cssText =
-    'position:absolute;inset:0;border-radius:9999px;background:#3b82f6;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.3);'
+  dot.style.cssText = `position:absolute;inset:0;border-radius:9999px;background:${BRAND.deep};border:2px solid #fff;box-shadow:0 1px 3px rgba(15,42,39,.28);`
 
   wrapper.appendChild(halo)
   wrapper.appendChild(dot)
@@ -29,21 +37,24 @@ function createCurrentLocationContent(): HTMLElement {
 // (yet) a registered spot, so it reads as "temporarily picked here" rather than a named spot.
 function createPickedLocationContent(): HTMLElement {
   const pin = document.createElement('div')
-  pin.style.cssText =
-    'display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;box-shadow:0 2px 6px rgba(0,0,0,.18);background:var(--color-primary-600);color:#fff;'
+  pin.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;box-shadow:0 2px 6px rgba(0,107,91,.24);background:${BRAND.primary};border:2px solid #fff;color:#fff;`
   pin.innerHTML = PIN_SVG
   return pin
 }
 
 // Marker shows only the pin — no name/address label, so the map stays legible once many
 // Spots are registered nearby. Selected Spot info surfaces via a preview card instead (see
-// MapPage), never as on-map text.
+// MapPage), never as on-map text. RE:FRAME 통일: 기본은 Soft Mint 배경 + Deep Green 아이콘,
+// 선택은 Primary Green 배경 + 흰색 아이콘/테두리(강조는 그린 계열 명도만 조절).
 function createMarkerContent(isSelected: boolean, onClick: () => void): HTMLElement {
   const wrapper = document.createElement('div')
   wrapper.style.cssText = `display:flex;align-items:center;justify-content:center;cursor:pointer;transform:scale(${isSelected ? 1.1 : 1});transition:transform .15s;`
 
   const pin = document.createElement('div')
-  pin.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;box-shadow:0 2px 6px rgba(0,0,0,.18);background:${isSelected ? 'var(--color-primary-600)' : '#fff'};color:${isSelected ? '#fff' : 'var(--color-primary-600)'};`
+  const base = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;`
+  pin.style.cssText = isSelected
+    ? `${base}background:${BRAND.primary};color:#fff;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,107,91,.30);`
+    : `${base}background:${BRAND.mint};color:${BRAND.deep};border:1px solid ${BRAND.border};box-shadow:0 1px 3px rgba(15,42,39,.10);`
   pin.innerHTML = PIN_SVG
 
   wrapper.appendChild(pin)
@@ -243,6 +254,12 @@ export function KakaoMap({
   return (
     <div className="absolute inset-0 overflow-hidden bg-neutral-100">
       <div ref={containerRef} className="h-full w-full" />
+      {/* Kakao 기본 타일의 노랑/주황 채도를 아주 약하게 눌러 RE:FRAME 톤과 어울리게 한다.
+          가독성을 해치지 않도록 극히 낮은 불투명도 + pointer-events:none(지도 조작 방해 없음). */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{ background: 'rgba(0,127,109,0.06)', mixBlendMode: 'multiply' }}
+      />
       {status === 'loading' && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary-600 border-t-transparent" />
