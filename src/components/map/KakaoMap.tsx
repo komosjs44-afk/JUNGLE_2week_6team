@@ -35,20 +35,18 @@ function createPickedLocationContent(): HTMLElement {
   return pin
 }
 
-function createMarkerContent(spot: Spot, isSelected: boolean, onClick: () => void): HTMLElement {
+// Marker shows only the pin — no name/address label, so the map stays legible once many
+// Spots are registered nearby. Selected Spot info surfaces via a preview card instead (see
+// MapPage), never as on-map text.
+function createMarkerContent(isSelected: boolean, onClick: () => void): HTMLElement {
   const wrapper = document.createElement('div')
-  wrapper.style.cssText = `display:flex;flex-direction:column;align-items:center;cursor:pointer;transform:scale(${isSelected ? 1.1 : 1});transition:transform .15s;`
+  wrapper.style.cssText = `display:flex;align-items:center;justify-content:center;cursor:pointer;transform:scale(${isSelected ? 1.1 : 1});transition:transform .15s;`
 
   const pin = document.createElement('div')
   pin.style.cssText = `display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;box-shadow:0 2px 6px rgba(0,0,0,.18);background:${isSelected ? 'var(--color-primary-600)' : '#fff'};color:${isSelected ? '#fff' : 'var(--color-primary-600)'};`
   pin.innerHTML = PIN_SVG
 
-  const label = document.createElement('span')
-  label.textContent = spot.name
-  label.style.cssText = `margin-top:4px;padding:2px 8px;border-radius:9999px;font-size:10px;font-weight:500;white-space:nowrap;box-shadow:0 1px 3px rgba(0,0,0,.12);background:${isSelected ? 'var(--color-primary-600)' : '#fff'};color:${isSelected ? '#fff' : 'var(--color-neutral-700, #37444a)'};`
-
   wrapper.appendChild(pin)
-  wrapper.appendChild(label)
   wrapper.addEventListener('click', onClick)
   return wrapper
 }
@@ -211,7 +209,7 @@ export function KakaoMap({
 
     spots.forEach((spot) => {
       const position = new window.kakao.maps.LatLng(spot.latitude, spot.longitude)
-      const content = createMarkerContent(spot, spot.id === selectedSpotId, () => onSelectSpot?.(spot.id))
+      const content = createMarkerContent(spot.id === selectedSpotId, () => onSelectSpot?.(spot.id))
       const overlay = new window.kakao.maps.CustomOverlay({
         position,
         content,

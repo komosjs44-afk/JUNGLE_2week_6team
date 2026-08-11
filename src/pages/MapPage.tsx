@@ -32,6 +32,13 @@ export function MapPage() {
     return spots.filter((s) => s.tags.includes(filter))
   }, [spots, filter])
 
+  // 태그 필터가 바뀌어 선택된 스팟이 결과에서 사라지면 선택도 함께 해제 (마커 없는 카드가 남지 않도록)
+  useEffect(() => {
+    if (selectedSpotId && !filteredSpots.some((s) => s.id === selectedSpotId)) {
+      setSelectedSpotId(null)
+    }
+  }, [filteredSpots, selectedSpotId])
+
   // 검색어와 일치하는 "등록된 스팟"
   const matchedSpots = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -165,6 +172,13 @@ export function MapPage() {
         )}
       </div>
 
+      {/* 선택된 Spot이 있을 때만 공간을 차지 — 지도 위를 덮지 않고 검색/필터 바로 아래에 표시 */}
+      {selectedSpot && (
+        <div className="px-3 pt-3">
+          <SpotPreviewCard spot={selectedSpot} />
+        </div>
+      )}
+
       <div className="relative flex-1">
         {isError ? (
           <ErrorState onRetry={() => refetch()} />
@@ -173,6 +187,7 @@ export function MapPage() {
             spots={filteredSpots}
             selectedSpotId={selectedSpotId}
             onSelectSpot={setSelectedSpotId}
+            onMapClick={() => setSelectedSpotId(null)}
             currentLocation={currentLocation}
             focusLocation={focusLocation}
             pickedLocation={pickedLocation}
@@ -182,12 +197,6 @@ export function MapPage() {
         {!isError && spots && filteredSpots.length === 0 && (
           <div className="absolute inset-x-6 top-6 rounded-lg bg-white shadow-lg shadow-black/5">
             <EmptyState title="해당 태그의 스팟이 없어요." description="다른 태그로 골라보세요." />
-          </div>
-        )}
-
-        {selectedSpot && (
-          <div className="absolute right-0 bottom-3 left-0 px-3">
-            <SpotPreviewCard spot={selectedSpot} />
           </div>
         )}
       </div>
