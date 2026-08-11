@@ -9,6 +9,7 @@ import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
 import { StateIcon } from '@/components/common/EmptyState'
 import { InfoRow } from '@/components/common/InfoRow'
+import { UploadPhotoPreview } from '@/components/upload/UploadPhotoPreview'
 
 const EXIF_ROWS: { key: 'cameraMake' | 'cameraModel' | 'lensModel' | 'aperture' | 'iso' | 'shutterSpeed'; label: string }[] = [
   { key: 'cameraMake', label: 'Camera' },
@@ -41,6 +42,7 @@ export function UploadExifPage() {
     <div className="flex flex-1 flex-col">
       <PageHeader title="촬영 정보 분석" />
       <ProgressBar step={2} total={5} />
+      <UploadPhotoPreview />
 
       <div className="flex flex-1 flex-col gap-4 px-4 py-4">
         {exifStatus === 'analyzing' && (

@@ -11,6 +11,7 @@ import { ProgressBar } from '@/components/common/ProgressBar'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
 import { KakaoMap } from '@/components/map/KakaoMap'
+import { UploadPhotoPreview } from '@/components/upload/UploadPhotoPreview'
 
 const SEARCH_DEBOUNCE_MS = 400
 
@@ -104,6 +105,7 @@ export function UploadLocationPage() {
     <div className="flex flex-1 flex-col">
       <PageHeader title="위치 확인" />
       <ProgressBar step={3} total={5} />
+      <UploadPhotoPreview />
 
       <div className="flex flex-1 flex-col gap-4 px-4 py-4">
         {gpsFound && !photoLocation && pickerMode === 'none' && (

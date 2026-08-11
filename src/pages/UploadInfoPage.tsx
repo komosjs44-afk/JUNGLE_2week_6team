@@ -12,6 +12,7 @@ import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
 import { Input, Textarea } from '@/components/common/Input'
 import { Tag } from '@/components/common/Tag'
+import { UploadPhotoPreview } from '@/components/upload/UploadPhotoPreview'
 
 const DIRECTIONS: { label: string; degrees: number }[] = [
   { label: '북', degrees: 0 },
@@ -88,6 +89,7 @@ export function UploadInfoPage() {
     <div className="flex flex-1 flex-col">
       <PageHeader title="추가 정보 입력" />
       <ProgressBar step={4} total={5} />
+      <UploadPhotoPreview />
 
       <div className="flex flex-1 flex-col gap-5 px-4 py-4">
         <Input label="제목" placeholder="예) 성수 연무장길 노을" value={title} onChange={(e) => setTitle(e.target.value)} />
