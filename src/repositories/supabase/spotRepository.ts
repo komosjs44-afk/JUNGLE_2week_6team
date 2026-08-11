@@ -51,4 +51,21 @@ export const supabaseSpotRepository: SpotRepository = {
     if (error) throw error
     return data ? toSpot(data as SpotRow) : null
   },
+
+  async create(input) {
+    const { data, error } = await supabase
+      .from('spots')
+      .insert({
+        name: input.name,
+        address: input.address ?? '',
+        image_url: input.imageUrl,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        tags: input.tags ?? [],
+      })
+      .select('*')
+      .single()
+    if (error) throw error
+    return toSpot(data as SpotRow)
+  },
 }

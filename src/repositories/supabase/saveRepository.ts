@@ -3,11 +3,19 @@ import { supabase } from '@/lib/supabase'
 
 const DUPLICATE = '23505' // unique 위반(이미 저장됨) → 무시
 
+interface SavedSpotRow {
+  spot_id: string
+}
+
+interface SavedReferenceRow {
+  reference_id: string
+}
+
 export const supabaseSaveRepository: SaveRepository = {
   async listSpotIds(userId) {
     const { data, error } = await supabase.from('saved_spots').select('spot_id').eq('user_id', userId)
     if (error) throw error
-    return data.map((r) => r.spot_id as string)
+    return (data as SavedSpotRow[]).map((r) => r.spot_id)
   },
 
   async listReferenceIds(userId) {
@@ -16,7 +24,7 @@ export const supabaseSaveRepository: SaveRepository = {
       .select('reference_id')
       .eq('user_id', userId)
     if (error) throw error
-    return data.map((r) => r.reference_id as string)
+    return (data as SavedReferenceRow[]).map((r) => r.reference_id)
   },
 
   async addSpot(userId, spotId) {
