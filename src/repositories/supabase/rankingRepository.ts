@@ -1,5 +1,5 @@
 import type { RankingRepository } from '../types'
-import type { RankingEntry, RankingTab, Spot } from '@/types'
+import type { RankingTab, Spot } from '@/types'
 import { supabase } from '@/lib/supabase'
 
 interface SpotRow {
