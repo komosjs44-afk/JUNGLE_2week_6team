@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Camera, ChevronRight, Heart, MapPin, MessageCircle, Wand2 } from 'lucide-react'
 import { clsx } from 'clsx'
 import { useReference, useRootReference } from '@/hooks'
-import { useSaveStore } from '@/stores'
+import { useSaveStore, useMemberGateStore } from '@/stores'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
@@ -14,6 +14,7 @@ import { ADJUSTMENT_LABELS } from '@/types'
 import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { InfoRow } from '@/components/common/InfoRow'
+import { CommentSection } from '@/components/reference/CommentSection'
 import { formatDirection } from '@/utils/direction'
 import { formatDaypart, formatFocalLength, formatLikeCount, formatTimeOfDay } from '@/utils/format'
 
@@ -24,6 +25,7 @@ export function ReferenceDetailPage() {
   const { data: rootReference, isLoading: rootLoading, isDerived } = useRootReference(reference)
   const isSaved = useSaveStore((s) => (referenceId ? s.isReferenceSaved(referenceId) : false))
   const toggleSave = useSaveStore((s) => s.toggleReferenceSave)
+  const requireMember = useMemberGateStore((s) => s.requireMember)
 
   if (isLoading) {
     return (
@@ -62,7 +64,7 @@ export function ReferenceDetailPage() {
               <IconButton
                 variant="filled"
                 aria-label={isSaved ? '저장 취소' : '저장'}
-                onClick={() => toggleSave(reference.id)}
+                onClick={() => requireMember() && toggleSave(reference.id)}
               >
                 <Heart size={18} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
               </IconButton>
@@ -189,6 +191,10 @@ export function ReferenceDetailPage() {
             </div>
           </Accordion>
         )}
+
+        <div className="border-t border-neutral-100 pt-4">
+          <CommentSection referenceId={reference.id} />
+        </div>
       </div>
 
       <StickyActionBar>
@@ -216,7 +222,7 @@ export function ReferenceDetailPage() {
             </span>
           </Button>
           <div className="flex gap-2">
-            <Button variant="secondary" fullWidth onClick={() => toggleSave(reference.id)}>
+            <Button variant="secondary" fullWidth onClick={() => requireMember() && toggleSave(reference.id)}>
               <Heart size={16} className={clsx(isSaved && 'fill-primary-600 text-primary-600')} />
               {isSaved ? '저장됨' : '저장'}
             </Button>

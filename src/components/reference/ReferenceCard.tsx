@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Heart } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { Reference } from '@/types'
-import { useSaveStore } from '@/stores'
+import { useSaveStore, useMemberGateStore } from '@/stores'
 import { formatLikeCount } from '@/utils/format'
 import { clampFeedAspectRatio } from '@/utils/aspectRatio'
 import { Avatar } from '@/components/common/Avatar'
@@ -11,6 +11,7 @@ export function ReferenceCard({ reference }: { reference: Reference }) {
   const navigate = useNavigate()
   const isSaved = useSaveStore((s) => s.isReferenceSaved(reference.id))
   const toggleSave = useSaveStore((s) => s.toggleReferenceSave)
+  const requireMember = useMemberGateStore((s) => s.requireMember)
 
   return (
     <Link to={`/references/${reference.id}`} className="group flex flex-col gap-2">
@@ -29,6 +30,7 @@ export function ReferenceCard({ reference }: { reference: Reference }) {
           aria-label={isSaved ? '저장 취소' : '저장'}
           onClick={(e) => {
             e.preventDefault()
+            if (!requireMember()) return
             toggleSave(reference.id)
           }}
           className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm"

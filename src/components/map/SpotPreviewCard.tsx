@@ -2,12 +2,13 @@ import { Link } from 'react-router-dom'
 import { Heart, Images } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { Spot } from '@/types'
-import { useSaveStore } from '@/stores'
+import { useSaveStore, useMemberGateStore } from '@/stores'
 import { Tag } from '@/components/common/Tag'
 
 export function SpotPreviewCard({ spot }: { spot: Spot }) {
   const isSaved = useSaveStore((s) => s.isSpotSaved(spot.id))
   const toggleSave = useSaveStore((s) => s.toggleSpotSave)
+  const requireMember = useMemberGateStore((s) => s.requireMember)
 
   return (
     <Link
@@ -36,6 +37,7 @@ export function SpotPreviewCard({ spot }: { spot: Spot }) {
         aria-label={isSaved ? '저장 취소' : '저장'}
         onClick={(e) => {
           e.preventDefault()
+          if (!requireMember()) return
           toggleSave(spot.id)
         }}
         className="flex h-9 w-9 shrink-0 items-center justify-center self-start rounded-full text-neutral-300"

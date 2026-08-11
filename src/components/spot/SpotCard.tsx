@@ -2,11 +2,12 @@ import { Link } from 'react-router-dom'
 import { Heart, Images } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { Spot } from '@/types'
-import { useSaveStore } from '@/stores'
+import { useSaveStore, useMemberGateStore } from '@/stores'
 
 export function SpotCard({ spot }: { spot: Spot }) {
   const isSaved = useSaveStore((s) => s.isSpotSaved(spot.id))
   const toggleSave = useSaveStore((s) => s.toggleSpotSave)
+  const requireMember = useMemberGateStore((s) => s.requireMember)
 
   return (
     <Link to={`/spots/${spot.id}`} className="group flex flex-col gap-2">
@@ -17,6 +18,7 @@ export function SpotCard({ spot }: { spot: Spot }) {
           aria-label={isSaved ? '저장 취소' : '저장'}
           onClick={(e) => {
             e.preventDefault()
+            if (!requireMember()) return
             toggleSave(spot.id)
           }}
           className="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm"

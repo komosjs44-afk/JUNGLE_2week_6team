@@ -48,6 +48,17 @@ export function formatRelativeDate(isoString: string): string {
   return `${Math.floor(diffDays / 30)}개월 전`
 }
 
+/** 댓글처럼 분 단위 체감이 중요한 곳에 쓰는 상대 시간("3분 전", "2시간 전"). 하루 넘어가면 formatRelativeDate와 같은 규칙. */
+export function formatRelativeTime(isoString: string): string {
+  const diffMs = Date.now() - new Date(isoString).getTime()
+  const diffMin = Math.floor(diffMs / (1000 * 60))
+  if (diffMin < 1) return '방금 전'
+  if (diffMin < 60) return `${diffMin}분 전`
+  const diffHour = Math.floor(diffMin / 60)
+  if (diffHour < 24) return `${diffHour}시간 전`
+  return formatRelativeDate(isoString)
+}
+
 export function formatLikeCount(count: number): string {
   if (count >= 10000) return `${(count / 10000).toFixed(1)}만`
   if (count >= 1000) return `${(count / 1000).toFixed(1)}천`

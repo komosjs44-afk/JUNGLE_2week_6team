@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { AppProviders } from '@/app/providers'
 import { AppRouter } from '@/app/router'
 import { useAuthStore, useSaveStore } from '@/stores'
+import { MemberGateModal } from '@/components/common/MemberGateModal'
 
 function App() {
   const init = useAuthStore((s) => s.init)
@@ -23,6 +24,7 @@ function App() {
   return (
     <AppProviders>
       <AppRouter />
+      <MemberGateModal />
     </AppProviders>
   )
 }
