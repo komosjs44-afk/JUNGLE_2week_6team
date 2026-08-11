@@ -1,11 +1,17 @@
 import { create } from 'zustand'
 import type { AdjustmentRecipe, ExifData, PhotoLocation } from '@/types'
+import type { AspectRatioOption } from '@/utils/cropImage'
 
 interface UploadWizardState {
   file: File | null
   previewUrl: string | null
   exif: ExifData | null
   exifStatus: 'idle' | 'analyzing' | 'found' | 'not_found'
+
+  /** 선택한 사진의 원본 비율(width/height). 사진 고를 때 계산해둔다. */
+  naturalAspectRatio: number | null
+  /** 사용자가 고른 비율 프리셋. 기본은 'original'(원본 비율 우선 적용, 크롭 없음). */
+  aspectRatioOption: AspectRatioOption
 
   spotId: string | null
   photoLocation: PhotoLocation | null
@@ -29,6 +35,8 @@ interface UploadWizardState {
 
   setFile: (file: File, previewUrl: string) => void
   setExif: (exif: ExifData | null, status: UploadWizardState['exifStatus']) => void
+  setNaturalAspectRatio: (ratio: number | null) => void
+  setAspectRatioOption: (option: AspectRatioOption) => void
   setSpotId: (id: string | null) => void
   setPhotoLocation: (location: PhotoLocation | null) => void
   setNewSpotName: (name: string) => void
@@ -50,6 +58,8 @@ const initialState = {
   previewUrl: null,
   exif: null,
   exifStatus: 'idle' as const,
+  naturalAspectRatio: null as number | null,
+  aspectRatioOption: 'original' as AspectRatioOption,
   spotId: null,
   photoLocation: null,
   newSpotName: '',
@@ -80,6 +90,8 @@ export const useUploadWizardStore = create<UploadWizardState>((set) => ({
       return {
         file,
         previewUrl,
+        naturalAspectRatio: null,
+        aspectRatioOption: 'original',
         spotId: null,
         photoLocation: null,
         newSpotName: '',
@@ -92,6 +104,8 @@ export const useUploadWizardStore = create<UploadWizardState>((set) => ({
       }
     }),
   setExif: (exif, exifStatus) => set({ exif, exifStatus }),
+  setNaturalAspectRatio: (naturalAspectRatio) => set({ naturalAspectRatio }),
+  setAspectRatioOption: (aspectRatioOption) => set({ aspectRatioOption }),
   setSpotId: (spotId) => set({ spotId }),
   setPhotoLocation: (photoLocation) => set({ photoLocation }),
   setNewSpotName: (newSpotName) => set({ newSpotName }),

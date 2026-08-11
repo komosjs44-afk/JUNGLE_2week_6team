@@ -4,6 +4,7 @@ import { clsx } from 'clsx'
 import type { Reference } from '@/types'
 import { useSaveStore } from '@/stores'
 import { formatLikeCount } from '@/utils/format'
+import { clampFeedAspectRatio } from '@/utils/aspectRatio'
 import { Avatar } from '@/components/common/Avatar'
 
 export function ReferenceCard({ reference }: { reference: Reference }) {
@@ -13,7 +14,10 @@ export function ReferenceCard({ reference }: { reference: Reference }) {
 
   return (
     <Link to={`/references/${reference.id}`} className="group flex flex-col gap-2">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-neutral-100">
+      <div
+        style={{ aspectRatio: clampFeedAspectRatio(reference.aspectRatio) }}
+        className="relative w-full overflow-hidden rounded-lg bg-neutral-100"
+      >
         <img
           src={reference.imageUrl}
           alt={reference.title}

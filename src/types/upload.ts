@@ -11,6 +11,8 @@ export interface NewReferenceInput {
   newSpotName?: string
   title: string
   imageUrl: string
+  /** 이미지 가로/세로 비율(width/height). 업로드 시 사용자가 고른 비율(또는 원본 비율)이 그대로 저장된다. */
+  aspectRatio?: number
   tags: string[]
   direction?: number
   creatorTip?: string

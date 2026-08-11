@@ -32,6 +32,7 @@ interface ReferenceRow {
   spot_id: string
   title: string
   image_url: string
+  aspect_ratio: number | null
   tags: string[] | null
   shot_at: string | null
   direction: number | null
@@ -84,6 +85,7 @@ function toReference(row: ReferenceRow): Reference | null {
     spotId: row.spot_id,
     title: row.title,
     imageUrl: row.image_url,
+    aspectRatio: row.aspect_ratio ?? undefined,
     sourceReferenceId: row.source_reference_id ?? undefined,
     creator: toUser(row.creator),
     spot: toSpot(row.spot),
@@ -173,6 +175,7 @@ export const supabaseReferenceRepository: ReferenceRepository = {
         spot_id: spotId,
         title: input.title,
         image_url: input.imageUrl,
+        aspect_ratio: input.aspectRatio ?? null,
         tags: input.tags,
         shot_at: input.exif?.shotAt ?? null,
         direction: input.direction ?? null,
