@@ -62,27 +62,30 @@ export const supabaseRouteRepository: RouteRepository = {
       .select('id, spot_id')
     if (referenceError) throw referenceError
 
-    const { data: likeData, error: likeError } = await supabase.from('likes').select('reference_id')
-    if (likeError) throw likeError
+    // 인기 지표 = 저장(하트) 수 — ranking 과 동일하게 saved_references 를 집계한다.
+    const { data: saveData, error: saveError } = await supabase
+      .from('saved_references')
+      .select('reference_id')
+    if (saveError) throw saveError
 
     const spots = spotData as SpotRow[]
     const references = (referenceData as { id: string; spot_id: string }[]) ?? []
-    const likes = (likeData as { reference_id: string }[]) ?? []
+    const saves = (saveData as { reference_id: string }[]) ?? []
 
     const refCountBySpot = new Map<string, number>()
     for (const r of references) {
       refCountBySpot.set(r.spot_id, (refCountBySpot.get(r.spot_id) ?? 0) + 1)
     }
 
-    const likeCountByRef = new Map<string, number>()
-    for (const l of likes) {
-      likeCountByRef.set(l.reference_id, (likeCountByRef.get(l.reference_id) ?? 0) + 1)
+    const saveCountByRef = new Map<string, number>()
+    for (const s of saves) {
+      saveCountByRef.set(s.reference_id, (saveCountByRef.get(s.reference_id) ?? 0) + 1)
     }
 
     const likeCountBySpot = new Map<string, number>()
     for (const r of references) {
-      const refLikes = likeCountByRef.get(r.id) ?? 0
-      likeCountBySpot.set(r.spot_id, (likeCountBySpot.get(r.spot_id) ?? 0) + refLikes)
+      const refSaves = saveCountByRef.get(r.id) ?? 0
+      likeCountBySpot.set(r.spot_id, (likeCountBySpot.get(r.spot_id) ?? 0) + refSaves)
     }
 
     const withCounts = spots.map((row) => ({
