@@ -21,7 +21,7 @@ function toErrorReason(error: GeolocationPositionError): GeolocationErrorReason 
  * Distinct from EXIF-derived photo location — this only reads the browser/device's
  * current position via navigator.geolocation, never a photo's metadata.
  */
-export function useGeolocation(): UseGeolocationResult {
+export function useGeolocation(enabled = true): UseGeolocationResult {
   const [result, setResult] = useState<UseGeolocationResult>({
     location: null,
     status: 'idle',
@@ -29,6 +29,7 @@ export function useGeolocation(): UseGeolocationResult {
   })
 
   useEffect(() => {
+    if (!enabled) return
     if (typeof navigator === 'undefined' || !navigator.geolocation) {
       setResult({ location: null, status: 'error', errorReason: 'unsupported' })
       return
@@ -53,7 +54,7 @@ export function useGeolocation(): UseGeolocationResult {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 },
     )
-  }, [])
+  }, [enabled])
 
   return result
 }

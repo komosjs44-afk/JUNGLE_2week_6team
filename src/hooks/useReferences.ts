@@ -1,12 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
 import { referenceService } from '@/services'
 import type { DiscoverTab } from '@/repositories/types'
-import type { Reference } from '@/types'
+import type { Reference, DeviceLocation } from '@/types'
 
-export function useReferences(tab: DiscoverTab) {
+export function useReferences(tab: DiscoverTab, location?: DeviceLocation | null) {
+  // '내 주변'에서만 위치를 반영. 좌표는 소수 3자리로 반올림해 미세 이동에 재요청하지 않게 한다.
+  const locKey =
+    tab === 'nearby' && location
+      ? `${location.latitude.toFixed(3)},${location.longitude.toFixed(3)}`
+      : null
   return useQuery({
-    queryKey: ['references', tab],
-    queryFn: () => referenceService.list(tab),
+    queryKey: ['references', tab, locKey],
+    queryFn: () => referenceService.list(tab, { location: location ?? undefined }),
   })
 }
 

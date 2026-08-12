@@ -23,8 +23,13 @@ import type {
 
 export type DiscoverTab = 'recommended' | 'popular' | 'nearby' | 'new'
 
+// '내 주변' 탭에서 거리순 정렬에 쓰는 사용자 현재 위치
+export interface ReferenceListOptions {
+  location?: { latitude: number; longitude: number } | null
+}
+
 export interface ReferenceRepository {
-  list(tab?: DiscoverTab): Promise<Reference[]>
+  list(tab?: DiscoverTab, options?: ReferenceListOptions): Promise<Reference[]>
   getById(id: string): Promise<Reference | null>
   getBySpotId(spotId: string): Promise<Reference[]>
   create(input: NewReferenceInput): Promise<Reference>

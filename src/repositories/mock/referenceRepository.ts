@@ -1,35 +1,43 @@
-import type { ReferenceRepository, DiscoverTab } from '../types'
+import type { ReferenceRepository, DiscoverTab, ReferenceListOptions } from '../types'
 import type { Reference } from '@/types'
 import { MOCK_REFERENCES, getUserById } from '@/mocks'
+import { haversineMeters } from '@/utils/spotMatching'
 import { mockDelay } from './delay'
 import { mockSpotRepository } from './spotRepository'
 
 const store: Reference[] = [...MOCK_REFERENCES]
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
-function pseudoDistanceRank(id: string): number {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) % 997
-  return hash
-}
-
-function sortForTab(list: Reference[], tab?: DiscoverTab): Reference[] {
+function sortForTab(list: Reference[], tab?: DiscoverTab, options?: ReferenceListOptions): Reference[] {
   const copy = [...list]
+  const bySavesThenNew = (a: Reference, b: Reference) =>
+    b.likeCount - a.likeCount || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   switch (tab) {
-    case 'popular':
-      return copy.sort((a, b) => b.likeCount - a.likeCount)
+    case 'popular': {
+      const weekAgo = Date.now() - WEEK_MS
+      const recent = copy.filter((r) => new Date(r.createdAt).getTime() >= weekAgo)
+      return (recent.length > 0 ? recent : copy).sort(bySavesThenNew)
+    }
     case 'new':
       return copy.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-    case 'nearby':
-      return copy.sort((a, b) => pseudoDistanceRank(a.id) - pseudoDistanceRank(b.id))
+    case 'nearby': {
+      const loc = options?.location
+      if (!loc) return copy.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      return copy.sort(
+        (a, b) =>
+          haversineMeters({ lat: loc.latitude, lng: loc.longitude }, { lat: a.spot.latitude, lng: a.spot.longitude }) -
+          haversineMeters({ lat: loc.latitude, lng: loc.longitude }, { lat: b.spot.latitude, lng: b.spot.longitude }),
+      )
+    }
     case 'recommended':
     default:
-      return copy.sort((a, b) => b.likeCount + b.commentCount - (a.likeCount + a.commentCount))
+      return copy.sort(bySavesThenNew)
   }
 }
 
 export const mockReferenceRepository: ReferenceRepository = {
-  async list(tab) {
-    return mockDelay(sortForTab(store, tab))
+  async list(tab, options) {
+    return mockDelay(sortForTab(store, tab, options))
   },
 
   async getById(id) {

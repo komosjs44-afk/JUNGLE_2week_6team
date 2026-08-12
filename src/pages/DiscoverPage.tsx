@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell, Search } from 'lucide-react'
-import { useReferences, useCurrentEvent } from '@/hooks'
+import { useReferences, useCurrentEvent, useGeolocation } from '@/hooks'
 import { EventCard } from '@/components/event/EventCard'
 import { PhotoGallery } from '@/components/discover/PhotoGallery'
 import { Tabs } from '@/components/common/Tabs'
@@ -22,7 +22,9 @@ export function DiscoverPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<DiscoverTab>('recommended')
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  const { data, isLoading, isError, refetch } = useReferences(tab)
+  // '내 주변' 탭일 때만 GPS 위치를 요청(그 외 탭에선 권한 팝업을 띄우지 않음)
+  const { location } = useGeolocation(tab === 'nearby')
+  const { data, isLoading, isError, refetch } = useReferences(tab, location)
   const { data: currentEvent } = useCurrentEvent()
 
   // 탭을 바꾸면 갤러리 데이터가 바뀌므로 열려있던 상세는 닫는다.

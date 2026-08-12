@@ -1,7 +1,15 @@
 import type { ReferenceRepository } from '../types'
 import type { Reference, Spot, User, ExifData, AdjustmentRecipe, AiShootingGuide } from '@/types'
 import { supabase } from '@/lib/supabase'
+import { haversineMeters } from '@/utils/spotMatching'
 import { supabaseSpotRepository } from './spotRepository'
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+// 저장(하트) 많은 순 → 동점은 최신순
+function bySavesThenNew(a: Reference, b: Reference): number {
+  return b.likeCount - a.likeCount || new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+}
 
 interface SpotRow {
   id: string
@@ -136,7 +144,7 @@ async function buildCountMaps(
 }
 
 export const supabaseReferenceRepository: ReferenceRepository = {
-  async list(tab) {
+  async list(tab, options) {
     const { data, error } = await supabase
       .from('references')
       .select(SELECT_WITH_RELATIONS)
@@ -145,19 +153,40 @@ export const supabaseReferenceRepository: ReferenceRepository = {
 
     const rows = data as unknown as ReferenceRow[]
     const { saveCount, commentCount } = await buildCountMaps(rows.map((r) => r.id))
+    // refs 는 이 시점에 최신순(created_at desc)
     const refs = rows
       .map((row) => toReference(row, saveCount.get(row.id) ?? 0, commentCount.get(row.id) ?? 0))
       .filter((r): r is Reference => r !== null)
 
-    // 인기순·추천 = 저장(하트) 많은 순 (동점은 최신). new/nearby 는 최신순(위 정렬 유지).
-    if (tab === undefined || tab === 'popular' || tab === 'recommended') {
-      refs.sort(
-        (a, b) =>
-          b.likeCount - a.likeCount ||
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
+    switch (tab) {
+      case 'popular': {
+        // 게시 후 일주일(최근 7일) 안의 글을 저장(좋아요) 많은 순. 최근 글이 없으면 전체로 폴백.
+        const weekAgo = Date.now() - WEEK_MS
+        const recent = refs.filter((r) => new Date(r.createdAt).getTime() >= weekAgo)
+        return (recent.length > 0 ? recent : refs).sort(bySavesThenNew)
+      }
+      case 'nearby': {
+        // 내 위치에서 스팟까지 가까운 순. 위치가 없으면(권한 거부 등) 최신순 유지.
+        const loc = options?.location
+        if (!loc) return refs
+        return refs.sort(
+          (a, b) =>
+            haversineMeters(
+              { lat: loc.latitude, lng: loc.longitude },
+              { lat: a.spot.latitude, lng: a.spot.longitude },
+            ) -
+            haversineMeters(
+              { lat: loc.latitude, lng: loc.longitude },
+              { lat: b.spot.latitude, lng: b.spot.longitude },
+            ),
+        )
+      }
+      case 'new':
+        return refs // 이미 최신순
+      case 'recommended':
+      default:
+        return refs.sort(bySavesThenNew)
     }
-    return refs
   },
 
   async getById(id) {
