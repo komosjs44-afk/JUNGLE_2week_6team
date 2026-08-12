@@ -29,6 +29,9 @@ interface AiAdjustNavState {
   targetName?: string
   creatorId?: string
   creatorName?: string
+  // Scene Match(실시간 구도 맞추기)에서 방금 촬영한 사진을 "내 사진"으로 넘겨받는 경우
+  myPhotoBlob?: Blob
+  myPhotoName?: string
 }
 
 export function AiAdjustPage() {
@@ -96,6 +99,16 @@ export function AiAdjustPage() {
       if (targetUrl) URL.revokeObjectURL(targetUrl)
     }
   }, [targetUrl])
+
+  // Scene Match에서 촬영 사진을 넘겨받았으면 "내 사진"으로 세팅 (최초 1회)
+  useEffect(() => {
+    const blob = navState?.myPhotoBlob
+    if (!blob || myFile) return
+    const file = new File([blob], navState?.myPhotoName || 'reshot.jpg', { type: blob.type || 'image/jpeg' })
+    setMyFile(file)
+    setMyUrl(URL.createObjectURL(file))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   function pickMy(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]

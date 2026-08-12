@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Camera } from 'lucide-react'
 import { useReference } from '@/hooks'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs } from '@/components/common/Tabs'
+import { Button } from '@/components/common/Button'
 import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { GuideTab } from '@/components/recreate/GuideTab'
@@ -19,6 +21,7 @@ const TAB_ITEMS: { value: RecreateTab; label: string }[] = [
 
 export function RecreatePage() {
   const { referenceId } = useParams<{ referenceId: string }>()
+  const navigate = useNavigate()
   const { data: reference, isLoading, isError, refetch } = useReference(referenceId)
   const [tab, setTab] = useState<RecreateTab>('guide')
 
@@ -40,6 +43,22 @@ export function RecreatePage() {
           <div className="border-b border-neutral-100 px-4 py-3">
             <Tabs items={TAB_ITEMS} value={tab} onChange={setTab} />
           </div>
+
+          {/* 실시간 구도 맞추기 — 카메라에 레퍼런스를 겹쳐 보며 구도 일치도를 안내 */}
+          <div className="px-4 pt-4">
+            <Button
+              fullWidth
+              icon={<Camera size={16} />}
+              onClick={() =>
+                navigate('/scene-match', {
+                  state: { targetUrl: reference.imageUrl, targetName: reference.title },
+                })
+              }
+            >
+              실시간 구도 맞추기 (Scene Match)
+            </Button>
+          </div>
+
           {tab === 'guide' && <GuideTab reference={reference} />}
           {tab === 'mode' && <ShootingModeTab />}
           {tab === 'adjustment' && <AdjustmentTab reference={reference} />}
