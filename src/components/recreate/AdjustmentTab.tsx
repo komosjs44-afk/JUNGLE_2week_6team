@@ -85,7 +85,7 @@ export function AdjustmentTab({ reference }: { reference: Reference }) {
   return (
     <div className="flex flex-col gap-4 px-4 py-4">
       {/* 레퍼런스(목표 색감) */}
-      <div className="flex items-center gap-3 rounded-2xl border border-neutral-100 p-3">
+      <div className="flex items-center gap-3 rounded-[12px] border border-neutral-100 p-3">
         <img
           src={reference.imageUrl}
           alt={reference.title}

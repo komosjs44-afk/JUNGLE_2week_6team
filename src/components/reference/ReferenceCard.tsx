@@ -17,7 +17,7 @@ export function ReferenceCard({ reference }: { reference: Reference }) {
     <Link to={`/references/${reference.id}`} className="group flex flex-col gap-2">
       <div
         style={{ aspectRatio: clampFeedAspectRatio(reference.aspectRatio) }}
-        className="relative w-full overflow-hidden rounded-lg bg-neutral-100"
+        className="relative w-full overflow-hidden rounded-[6px] bg-neutral-100"
       >
         <img
           src={reference.imageUrl}
@@ -39,7 +39,9 @@ export function ReferenceCard({ reference }: { reference: Reference }) {
         </button>
       </div>
       <div className="flex flex-col gap-0.5">
-        <p className="truncate text-sm font-medium text-neutral-900">{reference.title}</p>
+        <p className="truncate text-sm font-medium text-neutral-900">
+          {reference.title || reference.spot.name || '제목 없는 사진'}
+        </p>
         <p className="truncate text-xs text-neutral-400">{reference.spot.name}</p>
         <button
           type="button"

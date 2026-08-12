@@ -31,7 +31,7 @@ export function LeafHistoryPage() {
 
       <div className="flex-1 overflow-y-auto">
         <div className="flex flex-col gap-4 px-4 py-4">
-          <div className="flex flex-col items-center gap-1 rounded-2xl border border-neutral-100 py-6">
+          <div className="flex flex-col items-center gap-1 rounded-[12px] border border-neutral-100 py-6">
             <span className="text-xs text-neutral-400">현재 나뭇잎</span>
             <span className="flex items-center gap-1.5 text-3xl font-bold text-primary-700">
               <Leaf size={26} />

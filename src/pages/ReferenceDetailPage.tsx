@@ -1,7 +1,9 @@
+import { useEffect } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { Camera, ChevronRight, Heart, MapPin, MessageCircle, Wand2 } from 'lucide-react'
 import { clsx } from 'clsx'
-import { useReference, useRootReference } from '@/hooks'
+import { useReference, useReferencesBySpot, useRootReference } from '@/hooks'
+import { ReferenceCard } from '@/components/reference/ReferenceCard'
 import { useSaveStore, useMemberGateStore } from '@/stores'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
@@ -24,9 +26,16 @@ export function ReferenceDetailPage() {
   const navigate = useNavigate()
   const { data: reference, isLoading, isError, refetch } = useReference(referenceId)
   const { data: rootReference, isLoading: rootLoading, isDerived } = useRootReference(reference)
+  const { data: spotReferences } = useReferencesBySpot(reference?.spotId)
   const isSaved = useSaveStore((s) => (referenceId ? s.isReferenceSaved(referenceId) : false))
   const toggleSave = useSaveStore((s) => s.toggleReferenceSave)
   const requireMember = useMemberGateStore((s) => s.requireMember)
+
+  // 관련 사진 클릭으로 같은 상세 컴포넌트의 id만 바뀔 때, 이전 사진 스크롤 위치가 남지 않도록
+  // 스크롤 컨테이너(RootLayout의 main)를 맨 위로 되돌린다.
+  useEffect(() => {
+    document.querySelector('main')?.scrollTo({ top: 0, behavior: 'auto' })
+  }, [referenceId])
 
   if (isLoading) {
     return (
@@ -50,6 +59,9 @@ export function ReferenceDetailPage() {
   const timeLabel = reference.shooting.shotAt
     ? `${formatTimeOfDay(reference.shooting.shotAt)} / ${formatDaypart(reference.shooting.shotAt)}`
     : '정보 없음'
+
+  // 같은 스팟의 다른 사진 (현재 보고 있는 사진은 제외)
+  const relatedList = (spotReferences ?? []).filter((r) => r.id !== reference.id)
 
   return (
     <div className="flex flex-1 flex-col">
@@ -77,11 +89,17 @@ export function ReferenceDetailPage() {
       <div className="flex flex-1 flex-col gap-4 px-4 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="truncate text-lg font-bold text-neutral-900">{reference.title}</h1>
-            <Link to={`/spots/${reference.spot.id}`} className="mt-1 flex items-center gap-1 text-sm text-neutral-400">
+            {/* 제목 = 업로드 시 입력한 title. 빈 값(구 데이터)일 때만 스팟명 → 기본 문구로 폴백. */}
+            <h1 className="text-lg font-bold text-neutral-900">
+              {reference.title || reference.spot.name || '제목 없는 사진'}
+            </h1>
+            <Link to={`/spots/${reference.spot.id}`} className="mt-1 flex items-center gap-1 text-sm text-neutral-500">
               <MapPin size={13} />
               {reference.spot.name}
             </Link>
+            {reference.spot.address && reference.spot.address !== reference.spot.name && (
+              <p className="mt-0.5 text-xs text-neutral-400">{reference.spot.address}</p>
+            )}
           </div>
           <div className="flex shrink-0 items-center gap-3 text-sm text-neutral-400">
             <span className="flex items-center gap-1">
@@ -196,6 +214,17 @@ export function ReferenceDetailPage() {
         <div className="border-t border-neutral-100 pt-4">
           <AiShootingGuide reference={reference} />
         </div>
+
+        {relatedList.length > 0 && (
+          <div className="flex flex-col gap-3 border-t border-neutral-100 pt-4">
+            <h2 className="text-base font-semibold text-neutral-900">이 스팟의 다른 사진</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {relatedList.map((r) => (
+                <ReferenceCard key={r.id} reference={r} />
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="border-t border-neutral-100 pt-4">
           <CommentSection referenceId={reference.id} />

@@ -10,6 +10,7 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { IconButton } from '@/components/common/IconButton'
 import type { DiscoverTab } from '@/repositories/types'
+import logo from '@/assets/photos/9.png'
 
 const TAB_ITEMS: { value: DiscoverTab; label: string }[] = [
   { value: 'recommended', label: '추천' },
@@ -21,20 +22,27 @@ const TAB_ITEMS: { value: DiscoverTab; label: string }[] = [
 export function DiscoverPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<DiscoverTab>('recommended')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
   const { data, isLoading, isError, refetch } = useReferences(tab)
   const { data: currentEvent } = useCurrentEvent()
-
-  // 탭을 바꾸면 갤러리 데이터가 바뀌므로 열려있던 상세는 닫는다.
-  function changeTab(next: DiscoverTab) {
-    setTab(next)
-    setSelectedId(null)
-  }
 
   return (
     <div className="flex flex-1 flex-col">
       <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-neutral-100 bg-white/95 px-4 backdrop-blur">
-        <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:FRAME</h1>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            aria-label="RE:FRAME 홈"
+            onClick={() => document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="group shrink-0"
+          >
+            <img
+              src={logo}
+              alt="RE:FRAME logo"
+              className="h-10 w-10 object-contain transition-transform duration-200 group-active:scale-110 group-active:-rotate-6"
+            />
+          </button>
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900">RE:FRAME</h1>
+        </div>
         <div className="flex items-center gap-1">
           <IconButton aria-label="검색" onClick={() => navigate('/search')}>
             <Search size={20} />
@@ -46,7 +54,7 @@ export function DiscoverPage() {
       </header>
 
       <div className="px-4 py-3">
-        <Tabs items={TAB_ITEMS} value={tab} onChange={changeTab} />
+        <Tabs items={TAB_ITEMS} value={tab} onChange={setTab} />
       </div>
 
       {tab === 'recommended' && currentEvent && (
@@ -66,12 +74,7 @@ export function DiscoverPage() {
           (!data || data.length === 0 ? (
             <EmptyState />
           ) : (
-            <PhotoGallery
-              references={data}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              onClose={() => setSelectedId(null)}
-            />
+            <PhotoGallery references={data} />
           ))}
       </div>
     </div>

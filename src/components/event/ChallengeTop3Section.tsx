@@ -23,7 +23,7 @@ export function ChallengeTop3Section() {
           <Link
             key={entry.id}
             to={`/events/${data.event.id}/result`}
-            className="flex items-center gap-3 rounded-xl border border-neutral-100 p-2.5"
+            className="flex items-center gap-3 rounded-[10px] border border-neutral-100 p-2.5"
           >
             <span
               className={clsx(
@@ -36,7 +36,7 @@ export function ChallengeTop3Section() {
             <img
               src={entry.imageUrl}
               alt={entry.title}
-              className="h-12 w-12 shrink-0 rounded-lg object-cover"
+              className="h-12 w-12 shrink-0 rounded-[6px] object-cover"
             />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-neutral-900">{entry.title}</p>

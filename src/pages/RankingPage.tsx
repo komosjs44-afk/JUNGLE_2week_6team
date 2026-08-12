@@ -84,7 +84,7 @@ export function RankingPage() {
               >
                 {entry.rank}
               </span>
-              <img src={entry.spot.imageUrl} alt={entry.spot.name} className="h-14 w-14 shrink-0 rounded-xl object-cover" />
+              <img src={entry.spot.imageUrl} alt={entry.spot.name} className="h-14 w-14 shrink-0 rounded-[6px] object-cover" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-neutral-900">{entry.spot.name}</p>
                 <p className="flex items-center gap-1 truncate text-xs text-neutral-400">
