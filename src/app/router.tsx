@@ -27,6 +27,7 @@ import { FollowListPage } from '@/pages/FollowListPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { SearchPage } from '@/pages/SearchPage'
 import { AiAdjustPage } from '@/pages/AiAdjustPage'
+import { SceneMatchPage } from '@/pages/SceneMatchPage'
 import { SegmentPocPage } from '@/pages/dev/SegmentPocPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
@@ -61,6 +62,7 @@ export function AppRouter() {
             <Route path="/users/:userId/following" element={<FollowListPage mode="following" />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/ai-adjust" element={<AiAdjustPage />} />
+            <Route path="/scene-match" element={<SceneMatchPage />} />
 
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/upload/exif" element={<UploadExifPage />} />

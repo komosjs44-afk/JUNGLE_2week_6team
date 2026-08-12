@@ -2,7 +2,13 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AppShell } from './AppShell'
 import { BottomNavigation } from '../navigation/BottomNavigation'
 
-const HIDE_NAV_PATTERNS = [/^\/spots\/[^/]+$/, /^\/references\//, /^\/upload/, /^\/users\//]
+const HIDE_NAV_PATTERNS = [
+  /^\/spots\/[^/]+$/,
+  /^\/references\//,
+  /^\/upload/,
+  /^\/users\//,
+  /^\/scene-match/,
+]
 
 function shouldHideNav(pathname: string): boolean {
   return HIDE_NAV_PATTERNS.some((pattern) => pattern.test(pathname))
