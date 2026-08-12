@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Sparkles } from 'lucide-react'
 import { useReference } from '@/hooks'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs } from '@/components/common/Tabs'
-import { Button } from '@/components/common/Button'
 import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { GuideTab } from '@/components/recreate/GuideTab'
@@ -46,13 +44,6 @@ export function RecreatePage() {
           {tab === 'guide' && <GuideTab reference={reference} />}
           {tab === 'mode' && <ShootingModeTab />}
           {tab === 'adjustment' && <AdjustmentTab reference={reference} />}
-
-          {/* AR로 보기 — 준비 중 (실시간 구도 맞추기를 AR로 확장 예정). 하단 고정 */}
-          <div className="safe-bottom sticky bottom-0 mt-auto border-t border-neutral-100 bg-white/95 p-4 backdrop-blur">
-            <Button fullWidth variant="secondary" disabled icon={<Sparkles size={16} />}>
-              AR로 보기 (Coming Soon)
-            </Button>
-          </div>
         </>
       )}
     </div>

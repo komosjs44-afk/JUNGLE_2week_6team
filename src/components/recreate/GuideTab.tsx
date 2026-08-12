@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { Navigation, Lightbulb, MapPinned } from 'lucide-react'
+import { Navigation, Lightbulb, MapPinned, Scan } from 'lucide-react'
 import type { Reference } from '@/types'
 import { buildShootingGuide } from '@/utils/shootingGuide'
 import { formatDistance } from '@/utils/format'
@@ -61,8 +61,16 @@ export function GuideTab({ reference }: { reference: Reference }) {
         <Button variant="secondary" fullWidth icon={<MapPinned size={16} />}>
           촬영 위치로 이동
         </Button>
-        <Button variant="secondary" fullWidth disabled>
-          AR로 보기 (Coming Soon)
+        <Button
+          fullWidth
+          icon={<Scan size={16} />}
+          onClick={() =>
+            navigate('/scene-match', {
+              state: { targetUrl: reference.imageUrl, targetName: reference.title },
+            })
+          }
+        >
+          AR로 보기
         </Button>
       </div>
     </div>
