@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Bell, Search } from 'lucide-react'
-import { useReferences } from '@/hooks'
+import { useReferences, useCurrentEvent } from '@/hooks'
+import { EventCard } from '@/components/event/EventCard'
 import { Tabs } from '@/components/common/Tabs'
 import { ReferenceCard } from '@/components/reference/ReferenceCard'
 import { CardGridSkeleton } from '@/components/common/Skeleton'
@@ -46,6 +47,7 @@ export function DiscoverPage() {
   const navigate = useNavigate()
   const [tab, setTab] = useState<DiscoverTab>('recommended')
   const { data, isLoading, isError, refetch } = useReferences(tab)
+  const { data: currentEvent } = useCurrentEvent()
 
   return (
     <div className="flex flex-1 flex-col">
@@ -67,6 +69,11 @@ export function DiscoverPage() {
 
       {tab === 'recommended' ? (
         <>
+          {currentEvent && (
+            <div className="px-4 pt-1">
+              <EventCard event={currentEvent} />
+            </div>
+          )}
           <Section title="오늘의 추천" tab="recommended" />
           <Section title="지금 인기 있는 참고 사진" tab="popular" />
           <Section title="신규 참고 사진" tab="new" />
