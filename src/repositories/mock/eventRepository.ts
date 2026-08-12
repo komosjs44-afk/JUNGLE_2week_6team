@@ -1,5 +1,11 @@
 import type { EventRepository } from '../types'
-import type { EventEntry, EventResultEntry, PhotoEvent } from '@/types'
+import type {
+  ChallengeTop3,
+  EventEntry,
+  EventResultEntry,
+  MyEventParticipation,
+  PhotoEvent,
+} from '@/types'
 import { getEventStatus } from '@/types'
 import { MOCK_EVENTS, MOCK_EVENT_ENTRIES, getEventById } from '@/mocks'
 import { rewardForRank } from '@/config/rewards'
@@ -135,5 +141,33 @@ export const mockEventRepository: EventRepository = {
       }
     }
     return mockDelay(result)
+  },
+
+  async listMyParticipations(userId) {
+    const mine = entries.filter((e) => e.userId === userId)
+    const list: MyEventParticipation[] = mine.map((entry) => {
+      const event = getEventById(entry.eventId)!
+      const status = getEventStatus(event)
+      let rank: number | null = null
+      let awardedLeaves = 0
+      if (status === 'FINISHED') {
+        const ranked = computeResult(entry.eventId).find((r) => r.id === entry.id)
+        rank = ranked?.rank ?? null
+        awardedLeaves = ranked?.awardedLeaves ?? 0
+      }
+      return { event, entry, status, rank, awardedLeaves }
+    })
+    // 최신 이벤트 우선
+    list.sort((a, b) => new Date(b.event.createdAt).getTime() - new Date(a.event.createdAt).getTime())
+    return mockDelay(list)
+  },
+
+  async getLatestChallengeTop3() {
+    const finished = MOCK_EVENTS.filter((e) => getEventStatus(e) === 'FINISHED').sort(
+      (a, b) => new Date(b.resultAt).getTime() - new Date(a.resultAt).getTime(),
+    )
+    if (finished.length === 0) return mockDelay<ChallengeTop3 | null>(null)
+    const event = finished[0]
+    return mockDelay<ChallengeTop3 | null>({ event, entries: computeResult(event.id).slice(0, 3) })
   },
 }

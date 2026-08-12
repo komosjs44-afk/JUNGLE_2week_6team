@@ -1,9 +1,11 @@
 import type { EventRepository } from '../types'
 import type {
+  ChallengeTop3,
   EventEntry,
   EventResultEntry,
   EventReward,
   EventType,
+  MyEventParticipation,
   PhotoEvent,
   User,
 } from '@/types'
@@ -272,5 +274,54 @@ export const supabaseEventRepository: EventRepository = {
       }
     }
     return result
+  },
+
+  async listMyParticipations(userId) {
+    const { data, error } = await supabase
+      .from('event_entries')
+      .select('*')
+      .eq('user_id', userId)
+    if (error) throw error
+    const rows = data as EntryRow[]
+    if (rows.length === 0) return []
+
+    const myEntries = await assembleEntries(rows)
+    const eventIds = [...new Set(rows.map((r) => r.event_id))]
+    const { data: evData, error: evErr } = await supabase
+      .from('events')
+      .select('*')
+      .in('id', eventIds)
+    if (evErr) throw evErr
+    const eventMap = new Map((evData as EventRow[]).map((e) => [e.id, toEvent(e)]))
+
+    const resultCache = new Map<string, EventResultEntry[]>()
+    const out: MyEventParticipation[] = []
+    for (const entry of myEntries) {
+      const event = eventMap.get(entry.eventId)
+      if (!event) continue
+      const status = getEventStatus(event)
+      let rank: number | null = null
+      let awardedLeaves = 0
+      if (status === 'FINISHED') {
+        if (!resultCache.has(event.id)) resultCache.set(event.id, await this.getResult(event.id))
+        const ranked = resultCache.get(event.id)!.find((r) => r.id === entry.id)
+        rank = ranked?.rank ?? null
+        awardedLeaves = ranked?.awardedLeaves ?? 0
+      }
+      out.push({ event, entry, status, rank, awardedLeaves })
+    }
+    out.sort((a, b) => new Date(b.event.createdAt).getTime() - new Date(a.event.createdAt).getTime())
+    return out
+  },
+
+  async getLatestChallengeTop3() {
+    const events = await this.list()
+    const finished = events
+      .filter((e) => getEventStatus(e) === 'FINISHED')
+      .sort((a, b) => new Date(b.resultAt).getTime() - new Date(a.resultAt).getTime())
+    if (finished.length === 0) return null
+    const event = finished[0]
+    const entries = (await this.getResult(event.id)).slice(0, 3)
+    return { event, entries } satisfies ChallengeTop3
   },
 }

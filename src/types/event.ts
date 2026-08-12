@@ -56,6 +56,23 @@ export interface EventResultEntry extends EventEntry {
   awardedLeaves: number
 }
 
+// MY '나의 활동' — 내가 참여한 이벤트 + (종료 시) 내 순위/수상 나뭇잎.
+export interface MyEventParticipation {
+  event: PhotoEvent
+  entry: EventEntry
+  status: EventStatus
+  /** FINISHED일 때만 확정 순위, 그 외 null */
+  rank: number | null
+  /** 수상 나뭇잎 (수상권 밖이거나 미확정이면 0) */
+  awardedLeaves: number
+}
+
+// 랭킹 페이지 'TOP 3' — 확정된(FINISHED) 이벤트만.
+export interface ChallengeTop3 {
+  event: PhotoEvent
+  entries: EventResultEntry[]
+}
+
 // 사진으로 참여할 때의 입력 — 기존 참고 사진(references)을 이벤트에 연결한다.
 export interface NewEventEntryInput {
   eventId: string

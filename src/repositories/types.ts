@@ -15,6 +15,8 @@ import type {
   EventEntry,
   EventResultEntry,
   NewEventEntryInput,
+  MyEventParticipation,
+  ChallengeTop3,
   LeafTransaction,
   LeafAwardInput,
 } from '@/types'
@@ -96,6 +98,10 @@ export interface EventRepository {
   vote(eventId: string, entryId: string, userId: string): Promise<void>
   /** 투표 수 기준 순위 + 순위별 수상 나뭇잎. FINISHED에서만 의미 있음. */
   getResult(eventId: string): Promise<EventResultEntry[]>
+  /** MY '나의 활동' — 내가 참여한 이벤트(최신순) + 종료 시 순위/수상. */
+  listMyParticipations(userId: string): Promise<MyEventParticipation[]>
+  /** 랭킹용 — 가장 최근 확정(FINISHED) 이벤트의 TOP 3. 확정된 이벤트 없으면 null. */
+  getLatestChallengeTop3(): Promise<ChallengeTop3 | null>
 }
 
 export interface LeafRepository {

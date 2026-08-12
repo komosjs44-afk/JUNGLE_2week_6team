@@ -49,6 +49,21 @@ export function useEventResult(id: string | undefined) {
   })
 }
 
+export function useMyParticipations(userId: string | undefined) {
+  return useQuery({
+    queryKey: ['event', 'my-participations', userId],
+    queryFn: () => eventService.listMyParticipations(userId as string),
+    enabled: !!userId,
+  })
+}
+
+export function useLatestChallengeTop3() {
+  return useQuery({
+    queryKey: ['event', 'latest-top3'],
+    queryFn: () => eventService.getLatestChallengeTop3(),
+  })
+}
+
 export function useSubmitEventEntry() {
   const queryClient = useQueryClient()
   return useMutation({
@@ -56,6 +71,7 @@ export function useSubmitEventEntry() {
     onSuccess: (_data, input) => {
       queryClient.invalidateQueries({ queryKey: ['event', input.eventId] })
       queryClient.invalidateQueries({ queryKey: ['event', 'current'] })
+      queryClient.invalidateQueries({ queryKey: ['event', 'my-participations'] })
       queryClient.invalidateQueries({ queryKey: ['leaf'] })
     },
   })

@@ -9,6 +9,7 @@ import { Tag } from '@/components/common/Tag'
 import { ListRowSkeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { EmptyState } from '@/components/common/EmptyState'
+import { ChallengeTop3Section } from '@/components/event/ChallengeTop3Section'
 import { formatLikeCount } from '@/utils/format'
 
 const TAB_ITEMS: { value: RankingTab; label: string }[] = [
@@ -37,6 +38,8 @@ export function RankingPage() {
         <h1 className="mb-3 text-xl font-bold text-neutral-900">랭킹</h1>
         <Tabs items={TAB_ITEMS} value={tab} onChange={setTab} />
       </header>
+
+      <ChallengeTop3Section />
 
       <div className="flex items-center gap-2 px-4 py-3">
         <span className="shrink-0 rounded-full bg-neutral-100 px-3 py-1.5 text-xs font-medium whitespace-nowrap text-neutral-500">
