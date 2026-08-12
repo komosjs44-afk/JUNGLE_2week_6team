@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Search, MapPin } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import { Search, MapPin, Route, ChevronRight } from 'lucide-react'
 import { useSpots, useGeolocation } from '@/hooks'
 import { searchPlaces, type PlaceSearchResult } from '@/features/map/placesSearch'
 import { KakaoMap } from '@/components/map/KakaoMap'
@@ -93,8 +94,8 @@ export function MapPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="relative z-30 flex flex-col gap-3 border-b border-neutral-100 px-4 py-3">
-        <div className="flex h-11 items-center gap-2 rounded-xl bg-neutral-100 px-3">
-          <Search size={16} className="text-neutral-400" />
+        <div className="flex h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3">
+          <Search size={16} className="text-primary-700" />
           <input
             value={search}
             onChange={(e) => {
@@ -170,6 +171,25 @@ export function MapPage() {
             )}
           </div>
         )}
+      </div>
+
+      {/* 오늘의 추천 촬영 코스 진입 — 기존 /route 상세 페이지를 그대로 재사용 (얇은 카드, 지도 위 공간 최소) */}
+      <div className="px-3 pt-3">
+        <Link
+          to="/route"
+          className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-white px-4 py-3 shadow-lg shadow-black/5 active:bg-neutral-50"
+        >
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600">
+              <Route size={18} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-neutral-900">오늘의 추천 촬영 코스</p>
+              <p className="truncate text-xs text-neutral-400">가까운 인기 촬영 스팟을 코스로 둘러보세요</p>
+            </div>
+          </div>
+          <ChevronRight size={16} className="shrink-0 text-neutral-400" />
+        </Link>
       </div>
 
       {/* 선택된 Spot이 있을 때만 공간을 차지 — 지도 위를 덮지 않고 검색/필터 바로 아래에 표시 */}

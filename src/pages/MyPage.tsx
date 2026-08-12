@@ -12,6 +12,8 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { CardGridSkeleton } from '@/components/common/Skeleton'
 import { ReferenceCard } from '@/components/reference/ReferenceCard'
 import { SpotCard } from '@/components/spot/SpotCard'
+import { MyLeafCard } from '@/components/leaf/MyLeafCard'
+import { MyEventActivity } from '@/components/event/MyEventActivity'
 
 type SaveTab = 'reference' | 'spot'
 
@@ -98,6 +100,12 @@ export function MyPage() {
           <ChevronRight size={16} />
         </button>
       </div>
+
+      <div className="px-4 pt-3">
+        <MyLeafCard />
+      </div>
+
+      <MyEventActivity />
 
       <div className="flex flex-col gap-4 px-4 py-4">
         <Tabs
