@@ -76,6 +76,7 @@ export const supabaseAuthRepository: AuthRepository = {
         ...(patch.nickname !== undefined ? { nickname: patch.nickname } : {}),
         ...(patch.bio !== undefined ? { bio: patch.bio } : {}),
         ...(patch.website !== undefined ? { website: patch.website } : {}),
+        ...(patch.avatarUrl !== undefined ? { avatar_url: patch.avatarUrl } : {}),
       })
       .eq('id', userId)
       .select('*')

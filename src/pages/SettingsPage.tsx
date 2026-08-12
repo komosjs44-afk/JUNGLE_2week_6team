@@ -1,8 +1,10 @@
-import { useState, type FormEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
+import { Camera, LogOut } from 'lucide-react'
 import { useAuthStore } from '@/stores'
+import { uploadReferenceImage } from '@/features/upload/uploadImage'
 import { PageHeader } from '@/components/layout/PageHeader'
+import { Avatar } from '@/components/common/Avatar'
 import { Input, Textarea } from '@/components/common/Input'
 import { Button } from '@/components/common/Button'
 
@@ -18,8 +20,31 @@ export function SettingsPage() {
   const [website, setWebsite] = useState(user?.website ?? '')
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
 
   if (!user) return null
+
+  async function handleAvatarChange(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    e.target.value = '' // 같은 파일 다시 선택해도 onChange가 다시 뜨도록 초기화
+    if (!file || !user) return
+    if (!file.type.startsWith('image/')) {
+      setAvatarError('이미지 파일만 업로드할 수 있어요.')
+      return
+    }
+    setAvatarError(null)
+    setAvatarUploading(true)
+    try {
+      const url = await uploadReferenceImage(file, user.id)
+      await updateProfile({ avatarUrl: url })
+    } catch (err) {
+      setAvatarError(err instanceof Error ? err.message : '사진 업로드에 실패했어요.')
+    } finally {
+      setAvatarUploading(false)
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -47,6 +72,41 @@ export function SettingsPage() {
       <PageHeader title="계정 설정" />
 
       <form onSubmit={handleSubmit} className="flex flex-1 flex-col gap-4 px-4 py-4">
+        <div className="flex flex-col items-center gap-3 pb-2">
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={avatarUploading}
+            aria-label="프로필 사진 변경"
+            className="relative"
+          >
+            <Avatar nickname={user.nickname} avatarUrl={user.avatarUrl} size={88} />
+            <span className="absolute right-0 bottom-0 flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-primary-600 text-white">
+              {avatarUploading ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              ) : (
+                <Camera size={15} />
+              )}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => fileRef.current?.click()}
+            disabled={avatarUploading}
+            className="text-sm font-medium text-primary-600 disabled:opacity-50"
+          >
+            {avatarUploading ? '업로드 중…' : '프로필 사진 변경'}
+          </button>
+          {avatarError && <p className="text-sm text-danger">{avatarError}</p>}
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={handleAvatarChange}
+          />
+        </div>
+
         <Input label="이메일" value={user.email} disabled readOnly />
         <Input
           label="닉네임"
