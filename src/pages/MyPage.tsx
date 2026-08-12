@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { LogOut, Settings, Wand2, ChevronRight, Trash2 } from 'lucide-react'
 import { useAuthStore, useSaveStore } from '@/stores'
-import { useAllReferences, useSpots, useDeleteReference, useFollowCounts } from '@/hooks'
+import { useAllReferences, useSpots, useDeleteReference, useFollowCounts, useLeafBalance } from '@/hooks'
 import { Avatar } from '@/components/common/Avatar'
 import { ProfileStat } from '@/components/common/ProfileStat'
 import { Tabs } from '@/components/common/Tabs'
@@ -12,8 +12,8 @@ import { EmptyState } from '@/components/common/EmptyState'
 import { CardGridSkeleton } from '@/components/common/Skeleton'
 import { ReferenceCard } from '@/components/reference/ReferenceCard'
 import { SpotCard } from '@/components/spot/SpotCard'
-import { MyLeafCard } from '@/components/leaf/MyLeafCard'
 import { MyEventActivity } from '@/components/event/MyEventActivity'
+import { GradeCard } from '@/components/level/GradeCard'
 
 type SaveTab = 'reference' | 'spot'
 
@@ -25,6 +25,8 @@ export function MyPage() {
   const [tab, setTab] = useState<SaveTab>('reference')
   const deleteReference = useDeleteReference()
   const { data: followCounts } = useFollowCounts(user?.id)
+  // RP 출처(임시): 현재 앱의 유일한 포인트 지표인 나뭇잎 잔액을 RP로 사용. 실제 RP 필드가 생기면 이 한 줄만 교체.
+  const { data: rp } = useLeafBalance(user?.id)
   const myReferencesRef = useRef<HTMLDivElement>(null)
 
   const { data: allReferences, isLoading: refsLoading } = useAllReferences()
@@ -88,6 +90,10 @@ export function MyPage() {
       </header>
 
       <div className="px-4 pt-3">
+        <GradeCard rp={rp ?? 0} />
+      </div>
+
+      <div className="px-4 pt-3">
         <button
           type="button"
           onClick={() => navigate('/ai-adjust')}
@@ -99,10 +105,6 @@ export function MyPage() {
           </span>
           <ChevronRight size={16} />
         </button>
-      </div>
-
-      <div className="px-4 pt-3">
-        <MyLeafCard />
       </div>
 
       <MyEventActivity />

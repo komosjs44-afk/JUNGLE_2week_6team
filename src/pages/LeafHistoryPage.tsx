@@ -2,7 +2,6 @@ import { Leaf } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 import { useLeafBalance, useLeafTransactions } from '@/hooks'
 import type { LeafReason } from '@/types'
-import { getGrade } from '@/config/rewards'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
@@ -38,7 +37,6 @@ export function LeafHistoryPage() {
               <Leaf size={26} />
               {total}
             </span>
-            <span className="text-xs text-neutral-400">{getGrade(total).name}</span>
           </div>
 
           {isLoading ? (

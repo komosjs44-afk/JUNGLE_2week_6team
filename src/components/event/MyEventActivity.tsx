@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores'
 import { useMyParticipations } from '@/hooks'
 import { statusLabel } from '@/features/event/format'
-import { LeafAmount } from '@/components/leaf/LeafAmount'
 
 // MY '나의 활동' — 참여한 이벤트 + 수상 기록. 참여 내역이 없으면 렌더하지 않는다.
 export function MyEventActivity() {
@@ -40,7 +39,11 @@ export function MyEventActivity() {
                 {p.rank ? `${p.rank}위` : statusLabel(p.status)}
               </p>
             </div>
-            {p.awardedLeaves > 0 && <LeafAmount value={p.awardedLeaves} showSign size={13} />}
+            {p.awardedLeaves > 0 && (
+              <span className="shrink-0 text-xs font-semibold text-primary-700">
+                +{p.awardedLeaves} RP
+              </span>
+            )}
           </Link>
         ))}
       </div>
