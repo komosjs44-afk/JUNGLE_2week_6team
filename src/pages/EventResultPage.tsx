@@ -41,7 +41,7 @@ export function EventResultPage() {
           ) : (
             <>
               {/* 1위 */}
-              <div className="flex flex-col gap-3 rounded-2xl border border-neutral-100 p-4 shadow-lg shadow-black/5">
+              <div className="flex flex-col gap-3 rounded-[12px] border border-neutral-100 p-4">
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-neutral-900">
                     1위

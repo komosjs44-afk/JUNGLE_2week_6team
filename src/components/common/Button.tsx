@@ -23,7 +23,7 @@ export function Button({
   return (
     <button
       className={clsx(
-        'inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-colors active:scale-[0.98]',
+        'inline-flex items-center justify-center gap-2 rounded-[10px] font-medium transition-colors active:scale-[0.98]',
         'disabled:cursor-not-allowed disabled:opacity-50',
         size === 'lg' ? 'h-13 min-h-[52px] px-6 text-base' : 'h-11 min-h-[44px] px-4 text-sm',
         variant === 'primary' && 'bg-primary-600 text-white hover:bg-primary-700',

@@ -94,7 +94,7 @@ export function MapPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <div className="relative z-30 flex flex-col gap-3 border-b border-neutral-100 px-4 py-3">
-        <div className="flex h-11 items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3">
+        <div className="flex h-11 items-center gap-2 rounded-[10px] border border-neutral-200 bg-neutral-50 px-3">
           <Search size={16} className="text-primary-700" />
           <input
             value={search}
@@ -117,7 +117,7 @@ export function MapPage() {
 
         {/* 통합 검색 결과 드롭다운 */}
         {dropdownOpen && (
-          <div className="absolute inset-x-4 top-full max-h-[60vh] overflow-y-auto rounded-2xl border border-neutral-100 bg-white p-2 shadow-lg shadow-black/10">
+          <div className="absolute inset-x-4 top-full max-h-[60vh] overflow-y-auto rounded-[12px] border border-neutral-100 bg-white p-2 shadow-md shadow-black/10">
             {searchStatus === 'loading' && matchedSpots.length === 0 && (
               <p className="py-4 text-center text-sm text-neutral-400">검색 중…</p>
             )}
@@ -130,9 +130,9 @@ export function MapPage() {
                     key={s.id}
                     type="button"
                     onClick={() => selectSpot(s.id, s.latitude, s.longitude)}
-                    className="flex items-center gap-3 rounded-xl p-2 text-left active:bg-neutral-50"
+                    className="flex items-center gap-3 rounded-[10px] p-2 text-left active:bg-neutral-50"
                   >
-                    <img src={s.imageUrl} alt={s.name} className="h-10 w-10 rounded-lg object-cover" />
+                    <img src={s.imageUrl} alt={s.name} className="h-10 w-10 rounded-[6px] object-cover" />
                     <div className="min-w-0">
                       <p className="truncate text-sm font-medium text-neutral-900">{s.name}</p>
                       <p className="truncate text-xs text-neutral-400">{s.address}</p>
@@ -150,9 +150,9 @@ export function MapPage() {
                     key={`${p.placeName}-${i}`}
                     type="button"
                     onClick={() => selectPlace(p)}
-                    className="flex items-center gap-3 rounded-xl p-2 text-left active:bg-neutral-50"
+                    className="flex items-center gap-3 rounded-[10px] p-2 text-left active:bg-neutral-50"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-neutral-100 text-neutral-500">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[6px] bg-neutral-100 text-neutral-500">
                       <MapPin size={18} />
                     </div>
                     <div className="min-w-0">
@@ -177,7 +177,7 @@ export function MapPage() {
       <div className="px-3 pt-3">
         <Link
           to="/route"
-          className="flex items-center justify-between gap-3 rounded-lg border border-neutral-100 bg-white px-4 py-3 shadow-lg shadow-black/5 active:bg-neutral-50"
+          className="flex items-center justify-between gap-3 rounded-[12px] border border-neutral-100 bg-white px-4 py-3 shadow-sm shadow-black/5 active:bg-neutral-50"
         >
           <div className="flex min-w-0 items-center gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600">
@@ -215,7 +215,7 @@ export function MapPage() {
         )}
 
         {!isError && spots && filteredSpots.length === 0 && (
-          <div className="absolute inset-x-6 top-6 rounded-lg bg-white shadow-lg shadow-black/5">
+          <div className="absolute inset-x-6 top-6 rounded-[12px] bg-white shadow-sm shadow-black/5">
             <EmptyState title="해당 태그의 스팟이 없어요." description="다른 태그로 골라보세요." />
           </div>
         )}

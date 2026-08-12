@@ -13,7 +13,7 @@ export function GradeCard({ rp }: { rp: number }) {
     : 100
 
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-neutral-100 bg-white p-4">
+    <div className="flex items-center gap-4 rounded-[12px] border border-neutral-100 bg-white p-4">
       {/* 등급 이미지 — 레벨마다 동일한 정사각 영역, 비율 유지(object-contain), 중앙 정렬, 투명 배경 그대로 */}
       <div className="flex h-20 w-20 shrink-0 items-center justify-center">
         <img

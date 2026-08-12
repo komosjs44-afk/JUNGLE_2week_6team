@@ -13,7 +13,7 @@ export function Input({ label, error, className, id, ...rest }: InputProps) {
       <input
         id={id}
         className={clsx(
-          'h-12 rounded-xl border bg-white px-4 text-sm text-neutral-900 outline-none transition-colors',
+          'h-12 rounded-[10px] border bg-white px-4 text-sm text-neutral-900 outline-none transition-colors',
           'placeholder:text-neutral-400 focus:border-primary-500',
           error ? 'border-danger' : 'border-neutral-200',
           className,
@@ -38,7 +38,7 @@ export function Textarea({ label, error, className, maxLength, value, ...rest }:
       {label && <span className="text-sm font-medium text-neutral-700">{label}</span>}
       <textarea
         className={clsx(
-          'min-h-[96px] resize-none rounded-xl border bg-white p-4 text-sm text-neutral-900 outline-none transition-colors',
+          'min-h-[96px] resize-none rounded-[10px] border bg-white p-4 text-sm text-neutral-900 outline-none transition-colors',
           'placeholder:text-neutral-400 focus:border-primary-500',
           error ? 'border-danger' : 'border-neutral-200',
           className,

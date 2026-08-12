@@ -284,7 +284,7 @@ export function AiAdjustPage() {
 
         {/* 결과 미리보기 — 영역별 모드면 블렌드 이미지, 아니면 recipe 실시간 적용 */}
         {myUrl && regionalActive && regionalUrl && (
-          <div className="overflow-hidden rounded-2xl border border-neutral-100">
+          <div className="overflow-hidden rounded-[12px] border border-neutral-100">
             <img src={regionalUrl} alt="영역별 보정 결과" className="w-full" />
           </div>
         )}
@@ -435,7 +435,7 @@ function PhotoSlot({
       type="button"
       disabled={locked}
       onClick={onClick}
-      className="relative flex aspect-[3/4] w-full items-center justify-center overflow-hidden rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 disabled:cursor-default"
+      className="relative flex aspect-[3/4] w-full items-center justify-center overflow-hidden rounded-[12px] border border-dashed border-neutral-300 bg-neutral-50 disabled:cursor-default"
     >
       {url ? (
         <img src={url} alt={label} className="h-full w-full object-cover" />

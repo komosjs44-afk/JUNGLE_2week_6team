@@ -32,7 +32,7 @@ export function RoutePage() {
           <p className="text-sm text-neutral-500">{route.description}</p>
 
           {/* 코스를 지도에 표시 — 방문 순서대로 마커에 번호를 달고 선으로 잇는다 */}
-          <div className="relative h-60 overflow-hidden rounded-2xl border border-neutral-100">
+          <div className="relative h-60 overflow-hidden rounded-[12px] border border-neutral-100">
             <KakaoMap
               spots={route.spots.map((rs) => rs.spot)}
               path={route.spots.map((rs) => ({

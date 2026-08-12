@@ -30,10 +30,10 @@ export function EventCard({ event }: { event: PhotoEvent }) {
   return (
     <Link
       to={`/events/${event.id}`}
-      className="flex flex-col gap-3 rounded-2xl border border-neutral-100 bg-white p-4 shadow-lg shadow-black/5"
+      className="flex flex-col gap-1.5 rounded-[12px] border border-neutral-100 bg-white p-3.5"
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-semibold tracking-wide text-primary-700">{event.label}</span>
+        <span className="text-[11px] font-semibold tracking-wide text-primary-700">{event.label}</span>
         <span
           className={clsx(
             'inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium',
@@ -44,27 +44,19 @@ export function EventCard({ event }: { event: PhotoEvent }) {
         </span>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <p className="text-lg font-bold text-neutral-900">{event.title}</p>
-        <p className="text-sm leading-relaxed text-neutral-500">{event.description}</p>
-      </div>
+      <p className="text-base font-bold text-neutral-900">{event.title}</p>
+      <p className="truncate text-xs text-neutral-500">{event.description}</p>
 
-      <div className="flex items-center gap-2 text-xs text-neutral-400">
-        <span>참여 {entries?.length ?? 0}명</span>
-        <span className="text-neutral-300">·</span>
-        <span>{statusDLabel(event)}</span>
-        {topReward !== undefined && (
-          <>
-            <span className="text-neutral-300">·</span>
-            <span className="text-primary-700">1위 {topReward} RP</span>
-          </>
-        )}
+      <div className="mt-0.5 flex items-center justify-between gap-2 text-xs text-neutral-400">
+        <span className="truncate">
+          참여 {entries?.length ?? 0}명 · {statusDLabel(event)}
+          {topReward !== undefined && <span className="text-primary-700"> · 1위 +{topReward}RP</span>}
+        </span>
+        <span className="flex shrink-0 items-center gap-0.5 font-medium text-primary-600">
+          {ctaLabel(status)}
+          <ChevronRight size={14} />
+        </span>
       </div>
-
-      <span className="mt-1 inline-flex h-10 items-center justify-center gap-1 rounded-xl bg-primary-600 text-sm font-medium text-white">
-        {ctaLabel(status)}
-        <ChevronRight size={16} />
-      </span>
     </Link>
   )
 }

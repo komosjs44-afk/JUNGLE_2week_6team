@@ -97,7 +97,7 @@ export function MyPage() {
         <button
           type="button"
           onClick={() => navigate('/ai-adjust')}
-          className="flex w-full items-center justify-between rounded-2xl bg-neutral-900 px-4 py-3 text-white"
+          className="flex w-full items-center justify-between rounded-[12px] bg-neutral-900 px-4 py-3 text-white"
         >
           <span className="flex items-center gap-2 text-sm font-medium">
             <Wand2 size={16} />

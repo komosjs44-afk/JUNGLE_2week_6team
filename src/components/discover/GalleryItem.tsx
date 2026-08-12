@@ -1,16 +1,16 @@
+import { Link } from 'react-router-dom'
 import type { Reference } from '@/types'
 import { clampFeedAspectRatio } from '@/utils/aspectRatio'
 
-// 갤러리 썸네일 — 사진만. 제목/닉네임/장소/태그/좋아요는 여기서 숨기고, 클릭 시 확장 상세로.
-// 원본 비율을 유지(과도한 세로/가로는 clampFeedAspectRatio로 완만하게 제한)하고 모서리는 직각(radius 0).
-export function GalleryItem({ reference, onSelect }: { reference: Reference; onSelect: () => void }) {
+// 갤러리 썸네일 — 사진만. 클릭하면 해당 사진의 상세 페이지(/references/:id)로 이동한다.
+// 원본 비율 유지(과도한 세로/가로는 clampFeedAspectRatio로 완만하게 제한), 모서리는 직각(radius 0).
+export function GalleryItem({ reference }: { reference: Reference }) {
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      aria-label={`${reference.title} 상세 보기`}
+    <Link
+      to={`/references/${reference.id}`}
+      aria-label={`${reference.title || reference.spot.name} 상세 보기`}
       style={{ aspectRatio: clampFeedAspectRatio(reference.aspectRatio) }}
-      className="group block w-full self-start overflow-hidden bg-neutral-100"
+      className="group block w-full self-start overflow-hidden rounded-[6px] bg-neutral-100"
     >
       <img
         src={reference.imageUrl}
@@ -18,6 +18,6 @@ export function GalleryItem({ reference, onSelect }: { reference: Reference; onS
         loading="lazy"
         className="h-full w-full object-cover transition-transform duration-200 group-active:scale-[0.98]"
       />
-    </button>
+    </Link>
   )
 }
