@@ -5,7 +5,6 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { EmptyState } from '@/components/common/EmptyState'
 import { ErrorState } from '@/components/common/ErrorState'
 import { Avatar } from '@/components/common/Avatar'
-import { LeafAmount } from '@/components/leaf/LeafAmount'
 
 export function EventResultPage() {
   const { eventId } = useParams()
@@ -47,7 +46,9 @@ export function EventResultPage() {
                   <span className="inline-flex items-center rounded-full bg-accent px-2.5 py-1 text-xs font-bold text-neutral-900">
                     1위
                   </span>
-                  {winner.awardedLeaves > 0 && <LeafAmount value={winner.awardedLeaves} showSign size={16} />}
+                  {winner.awardedLeaves > 0 && (
+                    <span className="text-base font-semibold text-primary-700">+{winner.awardedLeaves} RP</span>
+                  )}
                 </div>
                 <div className="aspect-square w-full overflow-hidden rounded-xl bg-neutral-100">
                   <img src={winner.imageUrl} alt={winner.title} className="h-full w-full object-cover" />
@@ -87,7 +88,9 @@ export function EventResultPage() {
                       </div>
                       <div className="flex shrink-0 flex-col items-end gap-0.5">
                         <span className="text-sm font-medium text-neutral-700">{entry.voteCount}표</span>
-                        {entry.awardedLeaves > 0 && <LeafAmount value={entry.awardedLeaves} showSign size={12} />}
+                        {entry.awardedLeaves > 0 && (
+                          <span className="text-xs font-semibold text-primary-700">+{entry.awardedLeaves} RP</span>
+                        )}
                       </div>
                     </div>
                   ))}

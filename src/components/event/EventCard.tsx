@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ChevronRight, Leaf } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { clsx } from 'clsx'
 import type { PhotoEvent } from '@/types'
 import { getEventStatus } from '@/types'
@@ -56,9 +56,7 @@ export function EventCard({ event }: { event: PhotoEvent }) {
         {topReward !== undefined && (
           <>
             <span className="text-neutral-300">·</span>
-            <span className="inline-flex items-center gap-0.5 text-primary-700">
-              <Leaf size={12} />1위 {topReward}
-            </span>
+            <span className="text-primary-700">1위 {topReward} RP</span>
           </>
         )}
       </div>

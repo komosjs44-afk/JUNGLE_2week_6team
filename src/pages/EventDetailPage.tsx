@@ -7,7 +7,6 @@ import { PageHeader } from '@/components/layout/PageHeader'
 import { StickyActionBar } from '@/components/layout/StickyActionBar'
 import { Button } from '@/components/common/Button'
 import { ErrorState } from '@/components/common/ErrorState'
-import { LeafAmount } from '@/components/leaf/LeafAmount'
 import { formatEventDate, statusLabel } from '@/features/event/format'
 
 function periodText(start: string, end: string): string {
@@ -132,7 +131,7 @@ export function EventDetailPage() {
               {event.rewards.map((r) => (
                 <div key={r.rank} className="flex items-center justify-between">
                   <span className="text-sm text-neutral-700">{r.rank}위</span>
-                  <LeafAmount value={r.leaves} />
+                  <span className="text-sm font-semibold text-primary-700">{r.leaves} RP</span>
                 </div>
               ))}
             </div>

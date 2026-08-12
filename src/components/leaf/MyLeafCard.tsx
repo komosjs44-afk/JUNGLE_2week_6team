@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom'
 import { ChevronRight, Leaf } from 'lucide-react'
 import { useAuthStore } from '@/stores'
 import { useLeafBalance, useLeafTransactions } from '@/hooks'
-import { getGrade } from '@/config/rewards'
 
 // MY 페이지용 나뭇잎 요약 카드 — 잔액/등급/이번 달 적립 + 내역 진입.
 export function MyLeafCard() {
@@ -30,10 +29,7 @@ export function MyLeafCard() {
           <Leaf size={20} />
           {total}
         </span>
-        <span className="text-xs text-neutral-400">
-          {getGrade(total).name}
-          {monthGain > 0 ? ` · 이번 달 +${monthGain}` : ''}
-        </span>
+        {monthGain > 0 && <span className="text-xs text-neutral-400">이번 달 +{monthGain}</span>}
       </div>
       <span className="flex items-center gap-1 text-sm text-neutral-400">
         나뭇잎 내역
