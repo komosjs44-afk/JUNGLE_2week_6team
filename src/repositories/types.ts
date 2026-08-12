@@ -37,6 +37,7 @@ export interface ProfileUpdate {
   nickname?: string
   bio?: string
   website?: string
+  avatarUrl?: string
 }
 
 export interface SpotRepository {
