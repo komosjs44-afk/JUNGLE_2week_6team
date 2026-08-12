@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { Camera } from 'lucide-react'
+import { useParams } from 'react-router-dom'
+import { Sparkles } from 'lucide-react'
 import { useReference } from '@/hooks'
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Tabs } from '@/components/common/Tabs'
@@ -21,7 +21,6 @@ const TAB_ITEMS: { value: RecreateTab; label: string }[] = [
 
 export function RecreatePage() {
   const { referenceId } = useParams<{ referenceId: string }>()
-  const navigate = useNavigate()
   const { data: reference, isLoading, isError, refetch } = useReference(referenceId)
   const [tab, setTab] = useState<RecreateTab>('guide')
 
@@ -44,24 +43,16 @@ export function RecreatePage() {
             <Tabs items={TAB_ITEMS} value={tab} onChange={setTab} />
           </div>
 
-          {/* 실시간 구도 맞추기 — 카메라에 레퍼런스를 겹쳐 보며 구도 일치도를 안내 */}
-          <div className="px-4 pt-4">
-            <Button
-              fullWidth
-              icon={<Camera size={16} />}
-              onClick={() =>
-                navigate('/scene-match', {
-                  state: { targetUrl: reference.imageUrl, targetName: reference.title },
-                })
-              }
-            >
-              실시간 구도 맞추기 (Scene Match)
-            </Button>
-          </div>
-
           {tab === 'guide' && <GuideTab reference={reference} />}
           {tab === 'mode' && <ShootingModeTab />}
           {tab === 'adjustment' && <AdjustmentTab reference={reference} />}
+
+          {/* AR로 보기 — 준비 중 (실시간 구도 맞추기를 AR로 확장 예정). 하단 고정 */}
+          <div className="safe-bottom sticky bottom-0 mt-auto border-t border-neutral-100 bg-white/95 p-4 backdrop-blur">
+            <Button fullWidth variant="secondary" disabled icon={<Sparkles size={16} />}>
+              AR로 보기 (Coming Soon)
+            </Button>
+          </div>
         </>
       )}
     </div>
