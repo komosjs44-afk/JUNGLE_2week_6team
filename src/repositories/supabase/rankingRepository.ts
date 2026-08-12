@@ -20,7 +20,7 @@ interface ReferenceRow {
   spot_id: string
 }
 
-interface LikeRow {
+interface SaveRow {
   reference_id: string
 }
 
@@ -54,15 +54,17 @@ export const supabaseRankingRepository: RankingRepository = {
 
     if (referenceError) throw referenceError
 
-    const { data: likeData, error: likeError } = await supabase
-      .from('likes')
+    // 인기 지표 = 저장(하트) 수. 앱의 실제 사용자 동작이 "저장(saved_references)"이라
+    // 이 테이블을 집계한다. (likes 테이블은 앱에서 쓰지 않아 항상 비어 있었음)
+    const { data: saveData, error: saveError } = await supabase
+      .from('saved_references')
       .select('reference_id')
 
-    if (likeError) throw likeError
+    if (saveError) throw saveError
 
     const spots = spotData as SpotRow[]
     const references = referenceData as ReferenceRow[]
-    const likes = likeData as LikeRow[]
+    const saves = (saveData as SaveRow[] | null) ?? []
 
     // spot별 reference 개수
     const referenceCountBySpot = new Map<string, number>()
@@ -74,25 +76,25 @@ export const supabaseRankingRepository: RankingRepository = {
       )
     }
 
-    // reference별 like 개수
-    const likeCountByReference = new Map<string, number>()
+    // reference별 저장 개수
+    const saveCountByReference = new Map<string, number>()
 
-    for (const like of likes) {
-      likeCountByReference.set(
-        like.reference_id,
-        (likeCountByReference.get(like.reference_id) ?? 0) + 1,
+    for (const save of saves) {
+      saveCountByReference.set(
+        save.reference_id,
+        (saveCountByReference.get(save.reference_id) ?? 0) + 1,
       )
     }
 
-    // spot별 전체 like 개수
+    // spot별 전체 저장 개수 (= 화면의 하트 수)
     const likeCountBySpot = new Map<string, number>()
 
     for (const reference of references) {
-      const likeCount = likeCountByReference.get(reference.id) ?? 0
+      const saveCount = saveCountByReference.get(reference.id) ?? 0
 
       likeCountBySpot.set(
         reference.spot_id,
-        (likeCountBySpot.get(reference.spot_id) ?? 0) + likeCount,
+        (likeCountBySpot.get(reference.spot_id) ?? 0) + saveCount,
       )
     }
 

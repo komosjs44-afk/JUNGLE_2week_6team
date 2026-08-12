@@ -1,4 +1,4 @@
-import type { ReferenceRepository, DiscoverTab } from '../types'
+import type { ReferenceRepository } from '../types'
 import type { Reference, Spot, User, ExifData, AdjustmentRecipe, AiShootingGuide } from '@/types'
 import { supabase } from '@/lib/supabase'
 import { supabaseSpotRepository } from './spotRepository'
@@ -78,8 +78,9 @@ function toUser(row: ProfileRow): User {
   }
 }
 
-// creator/spot 조인이 빠진 행은 화면에서 쓸 수 없으므로 null 반환 → 목록에서 걸러냄
-function toReference(row: ReferenceRow): Reference | null {
+// creator/spot 조인이 빠진 행은 화면에서 쓸 수 없으므로 null 반환 → 목록에서 걸러냄.
+// likeCount(하트)·commentCount 는 유지되지 않는 컬럼 대신 실제 테이블 집계값을 받는다.
+function toReference(row: ReferenceRow, saveCount: number, commentCount: number): Reference | null {
   if (!row.creator || !row.spot) return null
   return {
     id: row.id,
@@ -101,8 +102,8 @@ function toReference(row: ReferenceRow): Reference | null {
     exif: row.exif ?? undefined,
     adjustment: row.adjustment ?? undefined,
     aiShootingGuide: row.shooting_guide ?? undefined,
-    likeCount: row.like_count,
-    commentCount: row.comment_count,
+    likeCount: saveCount,
+    commentCount,
     createdAt: row.created_at,
   }
 }
@@ -110,28 +111,53 @@ function toReference(row: ReferenceRow): Reference | null {
 // 작성자(profiles)·장소(spots)를 함께 조인해서 가져오는 select
 const SELECT_WITH_RELATIONS = '*, creator:profiles!user_id(*), spot:spots!spot_id(*)'
 
-function orderFor(tab: DiscoverTab | undefined) {
-  switch (tab) {
-    case 'popular':
-      return { column: 'like_count', ascending: false }
-    case 'new':
-    case 'nearby': // 위치 기반 정렬은 추후. 지금은 최신순으로 대체
-      return { column: 'created_at', ascending: false }
-    case 'recommended':
-    default:
-      return { column: 'like_count', ascending: false }
-  }
+// 저장(하트)·댓글 수를 실제 테이블에서 집계한다. references 의 like_count/comment_count
+// 컬럼은 유지되지 않으므로(트리거 없음) 신뢰하지 않고 여기서 센다.
+async function buildCountMaps(
+  referenceIds: string[],
+): Promise<{ saveCount: Map<string, number>; commentCount: Map<string, number> }> {
+  const saveCount = new Map<string, number>()
+  const commentCount = new Map<string, number>()
+  if (referenceIds.length === 0) return { saveCount, commentCount }
+
+  const [savesRes, commentsRes] = await Promise.all([
+    supabase.from('saved_references').select('reference_id').in('reference_id', referenceIds),
+    supabase.from('comments').select('reference_id').in('reference_id', referenceIds),
+  ])
+  if (savesRes.error) throw savesRes.error
+  if (commentsRes.error) throw commentsRes.error
+
+  for (const s of (savesRes.data as { reference_id: string }[] | null) ?? [])
+    saveCount.set(s.reference_id, (saveCount.get(s.reference_id) ?? 0) + 1)
+  for (const c of (commentsRes.data as { reference_id: string }[] | null) ?? [])
+    commentCount.set(c.reference_id, (commentCount.get(c.reference_id) ?? 0) + 1)
+
+  return { saveCount, commentCount }
 }
 
 export const supabaseReferenceRepository: ReferenceRepository = {
   async list(tab) {
-    const order = orderFor(tab)
     const { data, error } = await supabase
       .from('references')
       .select(SELECT_WITH_RELATIONS)
-      .order(order.column, { ascending: order.ascending })
+      .order('created_at', { ascending: false })
     if (error) throw error
-    return (data as unknown as ReferenceRow[]).map(toReference).filter((r): r is Reference => r !== null)
+
+    const rows = data as unknown as ReferenceRow[]
+    const { saveCount, commentCount } = await buildCountMaps(rows.map((r) => r.id))
+    const refs = rows
+      .map((row) => toReference(row, saveCount.get(row.id) ?? 0, commentCount.get(row.id) ?? 0))
+      .filter((r): r is Reference => r !== null)
+
+    // 인기순·추천 = 저장(하트) 많은 순 (동점은 최신). new/nearby 는 최신순(위 정렬 유지).
+    if (tab === undefined || tab === 'popular' || tab === 'recommended') {
+      refs.sort(
+        (a, b) =>
+          b.likeCount - a.likeCount ||
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+    }
+    return refs
   },
 
   async getById(id) {
@@ -141,7 +167,9 @@ export const supabaseReferenceRepository: ReferenceRepository = {
       .eq('id', id)
       .maybeSingle()
     if (error) throw error
-    return data ? toReference(data as unknown as ReferenceRow) : null
+    if (!data) return null
+    const { saveCount, commentCount } = await buildCountMaps([id])
+    return toReference(data as unknown as ReferenceRow, saveCount.get(id) ?? 0, commentCount.get(id) ?? 0)
   },
 
   async getBySpotId(spotId) {
@@ -151,7 +179,12 @@ export const supabaseReferenceRepository: ReferenceRepository = {
       .eq('spot_id', spotId)
       .order('created_at', { ascending: false })
     if (error) throw error
-    return (data as unknown as ReferenceRow[]).map(toReference).filter((r): r is Reference => r !== null)
+
+    const rows = data as unknown as ReferenceRow[]
+    const { saveCount, commentCount } = await buildCountMaps(rows.map((r) => r.id))
+    return rows
+      .map((row) => toReference(row, saveCount.get(row.id) ?? 0, commentCount.get(row.id) ?? 0))
+      .filter((r): r is Reference => r !== null)
   },
 
   async create(input) {
