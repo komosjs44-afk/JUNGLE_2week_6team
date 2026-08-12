@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { Bell, ChevronRight, Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { Bell, Search } from 'lucide-react'
 import { useReferences } from '@/hooks'
 import { Tabs } from '@/components/common/Tabs'
 import { ReferenceCard } from '@/components/reference/ReferenceCard'
@@ -67,15 +67,6 @@ export function DiscoverPage() {
 
       {tab === 'recommended' ? (
         <>
-          <div className="px-4">
-            <Link
-              to="/route"
-              className="flex items-center justify-between rounded-2xl bg-neutral-900 px-4 py-3.5 text-white"
-            >
-              <span className="text-sm font-medium">오늘의 추천 촬영 코스 보기</span>
-              <ChevronRight size={16} />
-            </Link>
-          </div>
           <Section title="오늘의 추천" tab="recommended" />
           <Section title="지금 인기 있는 참고 사진" tab="popular" />
           <Section title="신규 참고 사진" tab="new" />
