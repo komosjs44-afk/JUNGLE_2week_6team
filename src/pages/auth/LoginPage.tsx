@@ -44,10 +44,14 @@ export function LoginPage() {
     }
   }
 
+  // 게스트가 접근할 수 있는 곳은 사진 피드뿐이라, 회원 전용 페이지(from)로 되돌리면 다시
+  // 로그인으로 튕겨 무한 반복이 된다. 게스트는 항상 피드에서 시작한다.
+  const GUEST_HOME = '/'
+
   function handleGuestEntry() {
     // 이미 닉네임을 정한 적 있으면(재접속) 바로 입장 — 다시 물어보지 않는다.
     if (guestNickname) {
-      navigate(from, { replace: true })
+      navigate(GUEST_HOME, { replace: true })
       return
     }
     setGuestStep('nickname')
@@ -66,7 +70,7 @@ export function LoginPage() {
 
   function handleStartExploring() {
     setGuestStep('closed')
-    navigate(from, { replace: true })
+    navigate(GUEST_HOME, { replace: true })
   }
 
   return (

@@ -17,7 +17,31 @@ declare namespace kakao.maps {
     setCenter(latlng: LatLng): void
     getCenter(): LatLng
     setLevel(level: number): void
+    setBounds(bounds: LatLngBounds): void
     relayout(): void
+  }
+
+  /** Accumulates LatLng points so the map can frame all of them (see Map.setBounds). */
+  class LatLngBounds {
+    constructor()
+    extend(latlng: LatLng): void
+    isEmpty(): boolean
+  }
+
+  interface PolylineOptions {
+    path: LatLng[]
+    map?: Map
+    strokeWeight?: number
+    strokeColor?: string
+    strokeOpacity?: number
+    strokeStyle?: string
+  }
+
+  /** A line connecting an ordered list of points — used to draw a route path. */
+  class Polyline {
+    constructor(options: PolylineOptions)
+    setMap(map: Map | null): void
+    setPath(path: LatLng[]): void
   }
 
   interface MarkerOptions {

@@ -6,6 +6,7 @@ import { formatDistance, formatDuration } from '@/utils/format'
 import { Button } from '@/components/common/Button'
 import { Skeleton } from '@/components/common/Skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
+import { KakaoMap } from '@/components/map/KakaoMap'
 
 export function RoutePage() {
   const { data: route, isLoading, isError, refetch } = useRecommendedRoute()
@@ -29,6 +30,18 @@ export function RoutePage() {
       {route && (
         <div className="flex flex-1 flex-col gap-5 px-4 py-4">
           <p className="text-sm text-neutral-500">{route.description}</p>
+
+          {/* 코스를 지도에 표시 — 방문 순서대로 마커에 번호를 달고 선으로 잇는다 */}
+          <div className="relative h-60 overflow-hidden rounded-2xl border border-neutral-100">
+            <KakaoMap
+              spots={route.spots.map((rs) => rs.spot)}
+              path={route.spots.map((rs) => ({
+                latitude: rs.spot.latitude,
+                longitude: rs.spot.longitude,
+              }))}
+              spotOrder={Object.fromEntries(route.spots.map((rs) => [rs.spot.id, rs.order]))}
+            />
+          </div>
 
           <div className="flex flex-col">
             {route.spots.map((rs, index) => (

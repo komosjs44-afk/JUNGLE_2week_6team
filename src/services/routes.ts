@@ -1,4 +1,5 @@
-import { mockRouteRepository } from '@/repositories/mock'
+import { supabaseRouteRepository } from '@/repositories/supabase/routeRepository'
 import type { RouteRepository } from '@/repositories/types'
 
-export const routeService: RouteRepository = mockRouteRepository
+// mock → supabase 로 교체. 되돌리려면 mockRouteRepository 로 바꾸면 됨.
+export const routeService: RouteRepository = supabaseRouteRepository

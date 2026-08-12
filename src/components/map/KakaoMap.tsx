@@ -42,6 +42,27 @@ function createPickedLocationContent(): HTMLElement {
   return pin
 }
 
+const ROUTE_LINE_COLOR = '#007a5e' // --color-primary-600 (SDK needs a literal hex, not a CSS var)
+
+// Numbered pin for route stops — the number makes the visit order legible on the map, matching
+// the numbered steps in the list below (see RoutePage).
+function createOrderMarkerContent(
+  order: number,
+  isSelected: boolean,
+  onClick: () => void,
+): HTMLElement {
+  const wrapper = document.createElement('div')
+  wrapper.style.cssText = `cursor:pointer;transform:scale(${isSelected ? 1.1 : 1});transition:transform .15s;`
+
+  const badge = document.createElement('div')
+  badge.style.cssText = `display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9999px;font-size:14px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.25);background:${ROUTE_LINE_COLOR};color:#fff;border:2px solid #fff;`
+  badge.textContent = String(order)
+
+  wrapper.appendChild(badge)
+  wrapper.addEventListener('click', onClick)
+  return wrapper
+}
+
 // Marker shows only the pin — no name/address label, so the map stays legible once many
 // Spots are registered nearby. Selected Spot info surfaces via a preview card instead (see
 // MapPage), never as on-map text. RE:FRAME 통일: 기본은 Soft Mint 배경 + Deep Green 아이콘,
@@ -80,6 +101,13 @@ interface KakaoMapProps {
   focusLocation?: { latitude: number; longitude: number } | null
   /** Fires with the tapped coordinates when the map is clicked. */
   onMapClick?: (lat: number, lng: number) => void
+  /**
+   * Ordered points to connect with a line — draws a route path (kakao Polyline) and frames the
+   * map to fit all of them. Pass the route's spots in visit order.
+   */
+  path?: { latitude: number; longitude: number }[] | null
+  /** Spot id → visit order number; markers with an entry render a numbered badge instead of a pin. */
+  spotOrder?: Record<string, number>
 }
 
 export function KakaoMap({
@@ -92,10 +120,13 @@ export function KakaoMap({
   pickedLocation = null,
   focusLocation = null,
   onMapClick,
+  path = null,
+  spotOrder,
 }: KakaoMapProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<kakao.maps.Map | null>(null)
   const overlaysRef = useRef<kakao.maps.CustomOverlay[]>([])
+  const polylineRef = useRef<kakao.maps.Polyline | null>(null)
   const currentLocationOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null)
   const pickedLocationOverlayRef = useRef<kakao.maps.CustomOverlay | null>(null)
   const hasCenteredOnCurrentLocationRef = useRef(false)
@@ -220,17 +251,56 @@ export function KakaoMap({
 
     spots.forEach((spot) => {
       const position = new window.kakao.maps.LatLng(spot.latitude, spot.longitude)
-      const content = createMarkerContent(spot.id === selectedSpotId, () => onSelectSpot?.(spot.id))
+      const isSelected = spot.id === selectedSpotId
+      const order = spotOrder?.[spot.id]
+      const content =
+        order !== undefined
+          ? createOrderMarkerContent(order, isSelected, () => onSelectSpot?.(spot.id))
+          : createMarkerContent(isSelected, () => onSelectSpot?.(spot.id))
       const overlay = new window.kakao.maps.CustomOverlay({
         position,
         content,
-        yAnchor: 1,
-        zIndex: spot.id === selectedSpotId ? 2 : 1,
+        // numbered badges are centered on the point; pins are anchored at their base
+        yAnchor: order !== undefined ? 0.5 : 1,
+        zIndex: isSelected ? 2 : 1,
       })
       overlay.setMap(mapRef.current!)
       overlaysRef.current.push(overlay)
     })
-  }, [status, spots, selectedSpotId, onSelectSpot])
+  }, [status, spots, selectedSpotId, onSelectSpot, spotOrder])
+
+  // Route path — connect the given points in order with a line, and frame the map to fit them.
+  useEffect(() => {
+    if (status !== 'ready' || !mapRef.current) return
+
+    polylineRef.current?.setMap(null)
+    polylineRef.current = null
+    if (!path || path.length < 2) return
+
+    const latLngs = path.map((p) => new window.kakao.maps.LatLng(p.latitude, p.longitude))
+    polylineRef.current = new window.kakao.maps.Polyline({
+      path: latLngs,
+      strokeWeight: 4,
+      strokeColor: ROUTE_LINE_COLOR,
+      strokeOpacity: 0.9,
+      strokeStyle: 'solid',
+    })
+    polylineRef.current.setMap(mapRef.current)
+
+    // Frame all stops. If every point is at (nearly) the same coordinate, setBounds would zoom
+    // in absurdly far — just center there at a sensible level instead.
+    const lats = path.map((p) => p.latitude)
+    const lngs = path.map((p) => p.longitude)
+    const span = Math.max(Math.max(...lats) - Math.min(...lats), Math.max(...lngs) - Math.min(...lngs))
+    if (span < 0.0005) {
+      mapRef.current.setCenter(latLngs[0])
+      mapRef.current.setLevel(4)
+    } else {
+      const bounds = new window.kakao.maps.LatLngBounds()
+      latLngs.forEach((ll) => bounds.extend(ll))
+      mapRef.current.setBounds(bounds)
+    }
+  }, [status, path])
 
   // Kakao renders into a fixed-size canvas at init time; if this map was mounted while
   // hidden (e.g. inside a tab that wasn't visible yet), it needs an explicit relayout once
@@ -247,6 +317,8 @@ export function KakaoMap({
         spots={spots}
         selectedSpotId={selectedSpotId}
         onSelectSpot={(id) => onSelectSpot?.(id)}
+        path={path}
+        spotOrder={spotOrder}
       />
     )
   }

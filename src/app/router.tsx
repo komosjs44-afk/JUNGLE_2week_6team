@@ -35,29 +35,30 @@ export function AppRouter() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
 
-      {/* 로그인 회원 또는 닉네임을 정한 게스트면 통과 — 조회 위주 화면들 */}
+      {/* 로그인 회원 또는 닉네임을 정한 게스트면 통과 */}
       <Route element={<RequireSession />}>
         <Route element={<RootLayout />}>
+          {/* 게스트도 볼 수 있는 영역은 "사진 피드" 뿐 — 발견 피드 + 사진 상세(방명록 댓글) */}
           <Route path="/" element={<DiscoverPage />} />
-          <Route path="/map" element={<MapPage />} />
-          <Route path="/spots/:spotId" element={<SpotDetailPage />} />
           <Route path="/references/:referenceId" element={<ReferenceDetailPage />} />
-          <Route path="/references/:referenceId/recreate" element={<RecreatePage />} />
 
-          <Route path="/ranking" element={<RankingPage />} />
-          <Route path="/route" element={<RoutePage />} />
-          <Route path="/events/:eventId" element={<EventDetailPage />} />
-          <Route path="/events/:eventId/submit" element={<EventSubmitPage />} />
-          <Route path="/events/:eventId/vote" element={<EventVotePage />} />
-          <Route path="/events/:eventId/result" element={<EventResultPage />} />
-          <Route path="/users/:userId" element={<UserProfilePage />} />
-          <Route path="/users/:userId/followers" element={<FollowListPage mode="followers" />} />
-          <Route path="/users/:userId/following" element={<FollowListPage mode="following" />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/ai-adjust" element={<AiAdjustPage />} />
-
-          {/* 여기부터는 진짜 로그인 회원만 — 게스트가 들어오면 로그인 화면으로 */}
+          {/* 그 외 전부 회원 전용 — 게스트/비로그인이 들어오면 로그인 화면으로 */}
           <Route element={<RequireAuth />}>
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/spots/:spotId" element={<SpotDetailPage />} />
+            <Route path="/references/:referenceId/recreate" element={<RecreatePage />} />
+            <Route path="/ranking" element={<RankingPage />} />
+            <Route path="/route" element={<RoutePage />} />
+            <Route path="/events/:eventId" element={<EventDetailPage />} />
+            <Route path="/events/:eventId/submit" element={<EventSubmitPage />} />
+            <Route path="/events/:eventId/vote" element={<EventVotePage />} />
+            <Route path="/events/:eventId/result" element={<EventResultPage />} />
+            <Route path="/users/:userId" element={<UserProfilePage />} />
+            <Route path="/users/:userId/followers" element={<FollowListPage mode="followers" />} />
+            <Route path="/users/:userId/following" element={<FollowListPage mode="following" />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/ai-adjust" element={<AiAdjustPage />} />
+
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/upload/exif" element={<UploadExifPage />} />
             <Route path="/upload/location" element={<UploadLocationPage />} />
