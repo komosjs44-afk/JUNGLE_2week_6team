@@ -89,13 +89,22 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { myPhotoUrl, referenceUrl } = await req.json()
+    const { myPhotoUrl, referenceUrl, baseline } = await req.json()
     if (!myPhotoUrl || !referenceUrl) {
       return new Response(JSON.stringify({ error: 'myPhotoUrl, referenceUrl 필요' }), {
         status: 400,
         headers: { ...CORS, 'Content-Type': 'application/json' },
       })
     }
+
+    // 하이브리드: 프론트가 픽셀 통계로 계산한 "측정 기반 초안"을 근거로 넘겨, 모델이 맨땅에서
+    // 추측하지 않고 이 값을 기준으로 미세조정하게 한다. (없어도 동작 — 하위 호환)
+    const baselineText =
+      baseline && typeof baseline === 'object'
+        ? `\n\n참고로, 픽셀 통계로 계산한 측정 기반 초안값이다 (완벽하진 않지만 방향과 크기의 근거로 삼아라):
+exposure=${Number(baseline.exposure) || 0}, contrast=${Number(baseline.contrast) || 0}, highlights=${Number(baseline.highlights) || 0}, shadows=${Number(baseline.shadows) || 0}, saturation=${Number(baseline.saturation) || 0}, temperature=${Number(baseline.temperature) || 0}.
+이 초안이 실제 두 사진의 차이와 맞으면 비슷하게 두고, 눈으로 본 analysis 와 어긋나는 항목만 바로잡아라.`
+        : ''
 
     const apiKey = Deno.env.get('GEMINI_API_KEY')
     if (!apiKey) throw new Error('GEMINI_API_KEY 시크릿이 설정되지 않았어요.')
@@ -112,7 +121,7 @@ Deno.serve(async (req: Request) => {
           contents: [
             {
               parts: [
-                { text: PROMPT },
+                { text: PROMPT + baselineText },
                 { inline_data: { mime_type: 'image/jpeg', data: refB64 } },
                 { inline_data: { mime_type: 'image/jpeg', data: myB64 } },
               ],

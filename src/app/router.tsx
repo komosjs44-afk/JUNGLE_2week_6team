@@ -22,6 +22,7 @@ import { FollowListPage } from '@/pages/FollowListPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { SearchPage } from '@/pages/SearchPage'
 import { AiAdjustPage } from '@/pages/AiAdjustPage'
+import { SegmentPocPage } from '@/pages/dev/SegmentPocPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 
 export function AppRouter() {
@@ -29,6 +30,8 @@ export function AppRouter() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      {/* 개발용 POC — 영역별 색 보정 실측 (로그인 불필요, 내비 없음) */}
+      <Route path="/dev/segment" element={<SegmentPocPage />} />
 
       {/* 로그인 회원 또는 닉네임을 정한 게스트면 통과 */}
       <Route element={<RequireSession />}>

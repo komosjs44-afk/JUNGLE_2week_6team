@@ -10,6 +10,8 @@ export interface ImageStats {
   meanR: number
   meanB: number
   meanChroma: number // 평균 채도 지표 (max-min)
+  meanHiL: number // 밝은 영역(L>128) 평균 밝기 — 없으면 -1 (하이라이트 매칭용)
+  meanLoL: number // 어두운 영역(L<=128) 평균 밝기 — 없으면 -1 (섀도우 매칭용)
 }
 
 function clamp(v: number, min: number, max: number): number {
@@ -49,6 +51,10 @@ export function analyzeStats(imageData: ImageData): ImageStats {
   let sumR = 0
   let sumB = 0
   let sumChroma = 0
+  let sumHiL = 0
+  let nHi = 0
+  let sumLoL = 0
+  let nLo = 0
   // 4픽셀마다 샘플링 (속도)
   for (let i = 0; i < data.length; i += 16) {
     const r = data[i]
@@ -60,6 +66,14 @@ export function analyzeStats(imageData: ImageData): ImageStats {
     sumR += r
     sumB += b
     sumChroma += Math.max(r, g, b) - Math.min(r, g, b)
+    // applyAdjustment 의 하이라이트/섀도우 경계(128)와 동일하게 나눠 영역별 밝기를 따로 집계
+    if (l > 128) {
+      sumHiL += l
+      nHi++
+    } else {
+      sumLoL += l
+      nLo++
+    }
     n++
   }
   const meanL = sumL / n
@@ -69,6 +83,8 @@ export function analyzeStats(imageData: ImageData): ImageStats {
     meanR: sumR / n,
     meanB: sumB / n,
     meanChroma: sumChroma / n,
+    meanHiL: nHi > 0 ? sumHiL / nHi : -1,
+    meanLoL: nLo > 0 ? sumLoL / nLo : -1,
   }
 }
 
@@ -104,12 +120,40 @@ export function computeMatchRecipe(user: ImageStats, ref: ImageStats): Adjustmen
     ADJUSTMENT_RANGES.saturation.max,
   )
 
+  // 5·6) 하이라이트/섀도우: 노출·온도·대비를 먼저 반영한 "예측 밝기"를 구한 뒤,
+  //   applyAdjustment 의 영역 보정식을 역산해 레퍼런스의 영역 밝기에 맞춘다.
+  //   (전역 평균만 맞추던 기존 4개에 더해, 밝은/어두운 영역을 따로 끌어당겨 톤을 더 정확히 맞춤)
+  const cf = 1 + contrast / 100 // applyAdjustment 의 contrastFactor 와 동일
+  const tempL = 0.185 * warmShift // 온도가 밝기에 주는 영향 (0.299-0.114 가중)
+  // 노출→온도→대비 순으로 영역 평균 밝기가 어떻게 변할지 예측
+  const predict = (zoneMean: number) => (f * zoneMean + tempL - 128) * cf + 128
+
+  // 하이라이트: weight = ((L-128)/127) * (highlights/100) * 40  → 역산
+  let highlights = 0
+  if (user.meanHiL >= 0 && ref.meanHiL >= 0) {
+    const hiPred = predict(user.meanHiL)
+    if (hiPred - 128 > 4) {
+      highlights = ((ref.meanHiL - hiPred) * 127 * 100) / (40 * (hiPred - 128))
+    }
+  }
+  highlights = clamp(highlights, ADJUSTMENT_RANGES.highlights.min, ADJUSTMENT_RANGES.highlights.max)
+
+  // 섀도우: weight = ((128-L)/128) * (shadows/100) * 40  → 역산
+  let shadows = 0
+  if (user.meanLoL >= 0 && ref.meanLoL >= 0) {
+    const loPred = predict(user.meanLoL)
+    if (128 - loPred > 4) {
+      shadows = ((ref.meanLoL - loPred) * 128 * 100) / (40 * (128 - loPred))
+    }
+  }
+  shadows = clamp(shadows, ADJUSTMENT_RANGES.shadows.min, ADJUSTMENT_RANGES.shadows.max)
+
   return {
     ...DEFAULT_ADJUSTMENT_RECIPE,
     exposure: Math.round(exposure * 100) / 100,
     contrast: Math.round(contrast),
-    highlights: 0,
-    shadows: 0,
+    highlights: Math.round(highlights),
+    shadows: Math.round(shadows),
     saturation: Math.round(saturation),
     temperature: Math.round(temperature),
   }

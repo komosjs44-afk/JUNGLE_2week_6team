@@ -12,6 +12,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
+      workbox: {
+        // onnxruntime-web(WASM, 세그멘테이션 POC용)은 수십 MB라 SW 프리캐시에서 제외한다.
+        // 앱 시작 시 미리 받지 않고, /dev/segment 진입 시 필요할 때만 로드된다.
+        globIgnores: ['**/*.wasm'],
+      },
       manifest: {
         name: 'RE:FRAME',
         short_name: 'RE:FRAME',
